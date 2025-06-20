@@ -47,10 +47,10 @@ public class AllMechs {
 
 
     public AllMechs(HardwareMap hardwareMap, int left, int right) {
-        frontLeft = hardwareMap.get(DcMotor.class, "left front");
-        rearLeft = hardwareMap.get(DcMotor.class, "left rear");
-        rearRight = hardwareMap.get(DcMotor.class, "right rear");
-        frontRight = hardwareMap.get(DcMotor.class, "right front");
+        frontLeft = hardwareMap.get(DcMotor.class, "leftfront");
+        rearLeft = hardwareMap.get(DcMotor.class, "leftback");
+        rearRight = hardwareMap.get(DcMotor.class, "rightback");
+        frontRight = hardwareMap.get(DcMotor.class, "rightfront");
 
         // Change this
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
