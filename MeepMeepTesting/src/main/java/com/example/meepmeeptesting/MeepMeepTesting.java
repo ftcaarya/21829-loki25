@@ -1,7 +1,6 @@
-package com.example.meepmeeptesting;
+package com.example.meepmeep;
 
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 
@@ -9,91 +8,108 @@ import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-import java.util.Vector;
+public class MeepMeepTesting extends MeepMeep {
+    private static final int fps = 60;
 
-public class MeepMeep {
+    public MeepMeepTesting(int windowSize) {
+        super(windowSize, fps);
+    }
+
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(700);
+        MeepMeepTesting meepMeepTesting = new MeepMeepTesting(700);
 
-        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
-                .setDimensions(18, 18)
+        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeepTesting)
+                .setDimensions(14, 15)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(80, 80, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
         // red left side
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-35, -61, Math.toRadians(90)))
-                //drop preloaded
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-52, -52 , Math.toRadians(45)), -Math.PI)
-
-                .strafeToLinearHeading(new Vector2d(-54, -45), Math.toRadians(90))
+//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-35, -63, Math.toRadians(90)))
+//                //drop preloaded
+//                .setReversed(false)
+//                .splineToLinearHeading(new Pose2d(-52, -52 , Math.toRadians(45)), -Math.PI)
+//
+//                .strafeToLinearHeading(new Vector2d(-54, -45), Math.toRadians(90))
 
                 /*
                     left spike barnacle detected
                  */
-                .turnTo(Math.toRadians(65))
-                .setTangent(0)
-                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), -Math.PI)
-                .setTangent(0)
-                .splineToLinearHeading(new Pose2d(-56, -44, Math.toRadians(95)), -Math.toRadians(180))
-                .setTangent(0)
-                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), -Math.PI)
+//                .turnTo(Math.toRadians(65))
+//                .setTangent(0)
+//                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), -Math.PI)
+//                .setTangent(0)
+//                .splineToLinearHeading(new Pose2d(-56, -44, Math.toRadians(95)), -Math.toRadians(180))
+//                .setTangent(0)
+//                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), -Math.PI)
+//                .setTangent(Math.toRadians(0))
+//                .splineToLinearHeading(new Pose2d(-45, -20, Math.toRadians(90)), Math.toRadians(90))
+//                .setTangent(Math.toRadians(90))
+//                .splineToLinearHeading(new Pose2d(-28, -9, Math.toRadians(0)), Math.toRadians(0))
+//                .setReversed(true)
+//                .splineToLinearHeading(new Pose2d(-45, -20, Math.toRadians(90)), Math.toRadians(-90))
+//                .setTangent(Math.toRadians(-90))
+//                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), Math.toRadians(180))
 
                 /*
                 middle spike barnacle detected
                  */
 
 //                                .turnTo(Math.toRadians(65))
-//                        .setTangent(-Math.PI)
+//                        .setTangent(180 + 65)
 //                                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), -Math.PI)
 //                                .setTangent(0)
-//                        .setReversed(false)
 //                                .splineToLinearHeading(new Pose2d(-56, -44, Math.toRadians(130)), -Math.toRadians(180))
-//                                .setTangent(-Math.toRadians(180))
 //                        .setReversed(true)
-//                                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), 0)
-//                                .setReversed(false)
+//                                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), Math.toRadians(-90))
 //                                .setTangent(Math.toRadians(0))
 //                                .splineToLinearHeading(new Pose2d(-40, -20, Math.toRadians(90)), Math.toRadians(90))
 //                                .setTangent(Math.toRadians(90))
 //                                .splineToLinearHeading(new Pose2d(-28, -9, Math.toRadians(0)), Math.toRadians(0))
-//                                .setReversed(true)
 //                                .setTangent(Math.PI)
 //                                .splineToLinearHeading(new Pose2d(-40, -20, Math.toRadians(90)), Math.toRadians(-90))
-//                                .setReversed(true)
-//                                .setTangent(-Math.toRadians(90))
-//                                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), Math.toRadians(0))
+//                                .setTangent(Math.toRadians(-90))
+//                                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), Math.toRadians(180))
 
 
 
                 /*
                     right spike barnacle detected
                  */
-//                .strafeToLinearHeading(new Vector2d(-52, -52), Math.toRadians(45))
-//                .strafeToLinearHeading(new Vector2d(-54, -44), (Math.PI - Math.atan((18/14.5))))
-//                .strafeToLinearHeading(new Vector2d(-52, -52), Math.toRadians(45))
-//                .setReversed(false)
-//                        .setTangent(Math.toRadians(270))
-//                .splineToLinearHeading(new Pose2d(-60, -50, Math.toRadians(90)), -Math.toRadians(270))
-//                                .setTangent(-Math.toRadians(270))
-//                                .splineToConstantHeading(new Vector2d(-60, -6), -Math.toRadians(270))
-//                                .splineToLinearHeading(new Pose2d(-30, -6, Math.toRadians(0)), Math.toRadians(0))
+//                .setTangent(Math.toRadians(180 + 120))
+//                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), Math.toRadians(180 + 120))
+//                        .setTangent((Math.PI - Math.atan((18/14.5))))
+//                        .splineToLinearHeading(new Pose2d(-54, -44, (Math.PI - Math.atan((18/14.5)))), (Math.PI - Math.atan((18/14.5))))
+//                .setTangent(Math.toRadians(180 + 120))
+//                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), Math.toRadians(180 + 120))
+//                .setTangent(Math.toRadians(180))
+//                .splineToSplineHeading(new Pose2d(-59, -50, Math.toRadians(90)), Math.toRadians(180))
+//                .setTangent(Math.toRadians(90))
+//                .splineToConstantHeading(new Vector2d(-47, -6), Math.toRadians(0))
+//                .splineToLinearHeading(new Pose2d(-30, -9, Math.toRadians(0)), Math.toRadians(0))
+//                .setTangent(Math.toRadians(180))
+//                .splineToLinearHeading(new Pose2d(-47, -6, Math.toRadians(90)), Math.toRadians(180))
+//                        .setTangent(Math.toRadians(180))
+//                                .splineToConstantHeading(new Vector2d(-59, -50), Math.toRadians(270))
+//                        .setTangent(0)
+//                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), Math.toRadians(270))
+//                .setTangent(Math.toRadians(0))
+//                .splineToLinearHeading(new Pose2d(-30, -55, Math.toRadians(0)), Math.toRadians(0))
 //
-//                                .setReversed(true)
-//                                .splineToSplineHeading(new Pose2d(-60, -6, Math.toRadians(90)), Math.toRadians(180))
-//                        .setReversed(true)
-//                        .setTangent(Math.toRadians(270))
-//                                .splineToLinearHeading(new Pose2d(-60, -50, Math.toRadians(90)), Math.toRadians(-90))
 //
-//                    .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), -Math.toRadians(270))
-//                        .setTangent(Math.toRadians(0))
-//                                .splineToLinearHeading(new Pose2d(-30, -55, Math.toRadians(0)), Math.toRadians(0))
-                .build());
+//                .build());
 
-//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -66, Math.toRadians(270)))
-//                //drop preloaded
-//                .strafeToLinearHeading(new Vector2d(0, -31), Math.toRadians(270))
+
+//      red right side!!!
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -63, Math.toRadians(270)))
+                //drop preloaded
+                        .setTangent(Math.toRadians(110))
+                .splineToConstantHeading(new Vector2d(0, -35), Math.toRadians(110))
+                                .setTangent(Math.toRadians(300))
+                .splineToLinearHeading(new Pose2d(55, -45, Math.toRadians(90)), Math.toRadians(90))
+
+
+
 //                // get first sample
 //                .setReversed(false)
 //                .splineToSplineHeading(new Pose2d(33, -38, Math.toRadians(40)), Math.toRadians(45))
@@ -114,7 +130,10 @@ public class MeepMeep {
 //                //drop specimen 2
 //                .strafeToLinearHeading(new Vector2d(-9, -29), Math.toRadians(270))
 //                .strafeToConstantHeading(new Vector2d(5, -28), new TranslationalVelConstraint(20.0))
-//                .build());
+
+
+
+                .build());
 
         // red right side
 //        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -63, Math.toRadians(270)))
@@ -172,10 +191,16 @@ public class MeepMeep {
 
 
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
+
+
+
+
+        meepMeepTesting.setBackground(MeepMeepTesting.Background.FIELD_INTO_THE_DEEP_JUICE_DARK)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)
                 .start();
     }
+
+
 }
