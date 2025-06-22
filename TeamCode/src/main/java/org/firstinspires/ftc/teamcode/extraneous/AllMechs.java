@@ -8,11 +8,15 @@ import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.vision.EnhancedColorDetectionProcessor;
@@ -25,6 +29,9 @@ public class AllMechs {
     public ColorSensor colorSensor;
     public Gamepad testGamepad;
     public IMU imu;
+
+    public DcMotorEx vert_left, vert_right;
+    public ElapsedTime vertTimer;
 
     public DcMotor intake;
     public Servo pooper;
@@ -44,6 +51,10 @@ public class AllMechs {
     double cY = 0;
     static double width = 0;
 
+    public static int vertTarget;
+    public static double lastVertError = 0;
+    public static double pv = 0, iv = 0, dv = 0, fv = 0, integralSumVert = 0;
+
 
 
     public AllMechs(HardwareMap hardwareMap, int left, int right) {
@@ -57,6 +68,20 @@ public class AllMechs {
         rearLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        vert_left = hardwareMap.get(DcMotorEx.class, "vert left");
+        vert_right = hardwareMap.get(DcMotorEx.class, "vert right");
+
+        vert_right.setDirection(DcMotorSimple.Direction.FORWARD);
+        vert_left.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        vert_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vert_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        vert_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        vert_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        vertTimer = new ElapsedTime();
 
         colorSensor = hardwareMap.get(ColorSensor.class, "color sensor");
 
@@ -154,6 +179,37 @@ public class AllMechs {
             return new InstantAction(() -> testGamepad.stopRumble());
         }
     }
+
+    public Action setVertTarget(int target) {
+        return new InstantAction(() -> vertTarget = target);
+    }
+
+    public class UpdateVertPID implements Action {
+        double reference = vertTarget;
+        double state = vert_left.getVelocity();
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            double error = reference - state;
+            integralSumVert += error * vertTimer.seconds();
+            double derivative = (error - lastVertError) / vertTimer.seconds();
+            lastVertError = error;
+
+            vertTimer.reset();
+
+            double output = (error * pv) + (derivative * dv) + (integralSumVert * iv) + (reference * fv);
+
+            vert_left.setPower(output);
+            vert_right.setPower(output);
+
+            return true;
+        }
+    }
+
+    public Action updateVertPID() {
+        return new UpdateVertPID();
+    }
+
 
 
 }

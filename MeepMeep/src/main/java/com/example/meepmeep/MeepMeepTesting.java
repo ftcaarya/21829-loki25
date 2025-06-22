@@ -8,6 +8,8 @@ import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
+import java.util.Vector;
+
 public class MeepMeepTesting extends MeepMeep {
     private static final int fps = 60;
 
@@ -25,12 +27,11 @@ public class MeepMeepTesting extends MeepMeep {
                 .build();
 
         // red left side
-//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-35, -63, Math.toRadians(90)))
-//                //drop preloaded
-//                .setReversed(false)
-//                .splineToLinearHeading(new Pose2d(-52, -52 , Math.toRadians(45)), -Math.PI)
-//
-//                .strafeToLinearHeading(new Vector2d(-54, -45), Math.toRadians(90))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-35, -63, Math.toRadians(90)))
+                //drop preloaded
+                .setReversed(false)
+                .splineToLinearHeading(new Pose2d(-52, -52 , Math.toRadians(45)), -Math.PI)
+                .strafeToLinearHeading(new Vector2d(-54, -45), Math.toRadians(90))
 
                 /*
                     left spike barnacle detected
@@ -97,96 +98,90 @@ public class MeepMeepTesting extends MeepMeep {
 //                .splineToLinearHeading(new Pose2d(-30, -55, Math.toRadians(0)), Math.toRadians(0))
 //
 //
-//                .build());
+                .build());
 
 
 //      red right side!!!
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -63, Math.toRadians(270)))
-                //drop preloaded
-                        .setTangent(Math.toRadians(110))
-                .splineToConstantHeading(new Vector2d(0, -35), Math.toRadians(110))
-                                .setTangent(Math.toRadians(300))
-                .splineToLinearHeading(new Pose2d(55, -45, Math.toRadians(90)), Math.toRadians(90))
-
-
-
-//                // get first sample
-//                .setReversed(false)
-//                .splineToSplineHeading(new Pose2d(33, -38, Math.toRadians(40)), Math.toRadians(45))
-//                // drop first sample
-//                .strafeToLinearHeading(new Vector2d(38, -40), Math.toRadians(-45))
-//                // get second sample
-//                .turnTo(Math.toRadians(35))
-//                // drop second sample
-//                .strafeToLinearHeading(new Vector2d(47, -40), Math.toRadians(270))
-//                // pick specimen 1
-//                .strafeToConstantHeading(new Vector2d(47, -47.5))
-//                //drop specimen 1
-//                .strafeToLinearHeading(new Vector2d(-5, -29), Math.toRadians(270))
-//                //pick specimen 2
-//                .setReversed(false)
-//                .splineToLinearHeading(new Pose2d(47, -42, Math.toRadians(270)), Math.PI/9)
-//                .strafeToConstantHeading(new Vector2d(47, -47.5), new TranslationalVelConstraint(20.0))
-//                //drop specimen 2
-//                .strafeToLinearHeading(new Vector2d(-9, -29), Math.toRadians(270))
-//                .strafeToConstantHeading(new Vector2d(5, -28), new TranslationalVelConstraint(20.0))
-
-
-
-                .build());
-
-        // red right side
 //        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -63, Math.toRadians(270)))
-//                .strafeTo(new Vector2d(0, -34))
-//                .setReversed(false)
-//                .splineToLinearHeading(new Pose2d(48, -38, Math.toRadians(90)), Math.PI / 4)
-//                .strafeToLinearHeading(new Vector2d(48, -55), Math.toRadians(90))
-//                .setReversed(false)
-//                .splineToLinearHeading(new Pose2d(40, -10, Math.toRadians(0)), Math.PI/2)
-//                .strafeToLinearHeading(new Vector2d(58, -10), Math.toRadians(270))
-//                .strafeToConstantHeading(new Vector2d(58, -55))
-////                .strafeToConstantHeading(new Vector2d(58, -38))
-////                .strafeToConstantHeading(new Vector2d(58, -55))
-////                .setReversed(true)
-////                .splineToSplineHeading(new Pose2d(50, -30, Math.toRadians(0)), Math.PI/2)
-////                .splineToLinearHeading(new Pose2d(63, -10, Math.toRadians(-90)), Math.PI/6)
-////                .strafeToConstantHeading(new Vector2d(62, -55))
-//                .strafeToLinearHeading(new Vector2d(25, -58), Math.toRadians(0))
-//                .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(0))
-//                .strafeToLinearHeading(new Vector2d(0, -34), Math.toRadians(-90))
-//                .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(0))
-//                .strafeToLinearHeading(new Vector2d(0, -34), Math.toRadians(-90))
-//                .strafeToLinearHeading(new Vector2d(40, -58), Math.toRadians(0))
-//                .strafeToLinearHeading(new Vector2d(0, -34), Math.toRadians(-90))
-//                .build());
+//                //drop preloaded
+//                        .setTangent(Math.toRadians(110))
+//                .splineToConstantHeading(new Vector2d(0, -35), Math.toRadians(110))
+//                                .setTangent(Math.toRadians(300))
+//                .splineToLinearHeading(new Pose2d(55, -45, Math.toRadians(90)), Math.toRadians(45))
 
 
-        // testing
-//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -63, Math.toRadians(270)))
-//                .strafeToLinearHeading(new Vector2d(0,-36.5),Math.toRadians(270))
-//                // next thing
-//                .strafeTo(new Vector2d(20,-36.5))
-//                .splineToSplineHeading(new Pose2d(46,-13,Math.toRadians(270)),Math.toRadians(0))
-//                .strafeToLinearHeading(new Vector2d(46,-53),Math.toRadians(270))
-//                .waitSeconds(0.5)
-//                .strafeTo(new Vector2d(44,-13))
-//                .splineToLinearHeading(new Pose2d(55,-11.5,Math.toRadians(270)),Math.toRadians(0))
-//                .strafeToLinearHeading(new Vector2d(55,-53),Math.toRadians(270))
-//                .strafeToLinearHeading(new Vector2d(55,-33),Math.toRadians(0))
-//                // next thing
-//                .strafeToLinearHeading(new Vector2d(36,-56.5),Math.toRadians(0))
-//                //next thing
-//                .strafeToLinearHeading(new Vector2d(0,-36.5),Math.toRadians(270))
-//                // next thing
-//                .strafeToLinearHeading(new Vector2d(36,-56.5),Math.toRadians(0))
-//                // next thing
-//                .strafeToLinearHeading(new Vector2d(0,-36.5),Math.toRadians(270))
-//                // next thiing
-//                .strafeToLinearHeading(new Vector2d(36,-56.5),Math.toRadians(0))
-//                // wef
-//                .strafeToLinearHeading(new Vector2d(0,-36.5),Math.toRadians(270))
-//                // samplep get
-//                .strafeToLinearHeading(new Vector2d(36,-56.5),Math.toRadians(0))
+                /*
+                    left spike barnacle detected
+                 */
+//                                .turnTo(Math.toRadians(80))
+//                                .setTangent(Math.toRadians(290))
+//                                .splineToLinearHeading(new Pose2d(59, -52, Math.toRadians(100)), Math.toRadians(290))
+//                                .setTangent(Math.PI/2)
+//                                .splineToLinearHeading(new Pose2d(59, -42, Math.toRadians(60)), Math.toRadians(90))
+//                                .setTangent(Math.toRadians(180))
+//                                .splineToLinearHeading(new Pose2d(57, -62, Math.toRadians(-270)), Math.toRadians(270))
+//                                .setTangent(Math.toRadians(150))
+//                                .splineToLinearHeading(new Pose2d(-5, -35, Math.toRadians(270)), Math.toRadians(100))
+//                                .setTangent(Math.toRadians(320))
+//                                .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+//                                .setTangent(Math.toRadians(320-180))
+//                                .splineToConstantHeading(new Vector2d(3, -35), Math.toRadians(320-180))
+//                                .setTangent(Math.toRadians(320))
+//                                .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+//                                .setTangent(Math.toRadians(150))
+//                                .splineToConstantHeading(new Vector2d(-3, -35), Math.toRadians(150))
+//                                .setTangent(Math.toRadians(230))
+//                                .splineToLinearHeading(new Pose2d(-37, -35, Math.toRadians(180)), Math.toRadians(180))
+
+
+
+                /*
+                    middle spike barnacle detected
+                 */
+//                                .turnTo(Math.toRadians(110))
+//                                .setTangent(Math.toRadians(270))
+//                                .splineToLinearHeading(new Pose2d(54, -55, Math.toRadians(60)), Math.toRadians(270))
+//                                .setTangent(Math.toRadians(60))
+//                                .splineToConstantHeading(new Vector2d(59, -42), Math.toRadians(60))
+//                                .setTangent(Math.toRadians(180 + 60))
+//                                .splineToLinearHeading(new Pose2d(54, -62, Math.toRadians(90)), Math.toRadians(270))
+//                                .setTangent(Math.toRadians(140))
+//                                .splineToLinearHeading(new Pose2d(-5, -35, Math.toRadians(270)), Math.toRadians(100))
+//                                .setTangent(Math.toRadians(320))
+//                                .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+//                                .setTangent(Math.toRadians(320-180))
+//                                .splineToConstantHeading(new Vector2d(3, -35), Math.toRadians(320-180))
+//                                .setTangent(Math.toRadians(320))
+//                                .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+//                                .setTangent(Math.toRadians(150))
+//                                .splineToConstantHeading(new Vector2d(-3, -35), Math.toRadians(150))
+//                                .setTangent(Math.toRadians(230))
+//                                .splineToLinearHeading(new Pose2d(-20, -35, Math.toRadians(180)), Math.toRadians(180))
+
+                /*
+                    right spike barnacle detected
+                 */
+//                .turnTo(Math.toRadians(80))
+//                .setTangent(Math.toRadians(270))
+//                .splineToLinearHeading(new Pose2d(55, -55, Math.toRadians(105)), Math.toRadians(270))
+//                .setTangent(Math.toRadians(90))
+//                .splineToLinearHeading(new Pose2d(55, -45, Math.toRadians(105)), Math.toRadians(90))
+//                .setTangent(Math.toRadians(270))
+//                .splineToLinearHeading(new Pose2d(55, -59, Math.toRadians(90)), Math.toRadians(270))
+//                .setTangent(Math.toRadians(140))
+//                .splineToLinearHeading(new Pose2d(-5, -35, Math.toRadians(270)), Math.toRadians(100))
+//                .setTangent(Math.toRadians(320))
+//                .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+//                .setTangent(Math.toRadians(320-180))
+//                .splineToConstantHeading(new Vector2d(3, -35), Math.toRadians(320-180))
+//                .setTangent(Math.toRadians(320))
+//                .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+//                .setTangent(Math.toRadians(150))
+//                .splineToConstantHeading(new Vector2d(-3, -35), Math.toRadians(150))
+//
+
+
+
 //                .build());
 
 
