@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.extraneous;
 
 import androidx.annotation.NonNull;
-
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -25,6 +28,16 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
 public class AllMechs {
+    public PIDController controller_left;
+    public  PIDController controller_right;
+
+    public MultipleTelemetry telemetry;
+
+    public static double p = 0, i = 0, d = 0;
+    public static double f = 0;
+    public static int target = 0;
+    public final double ticks_in_degree = 700/180.0;
+
     public DcMotor frontLeft, rearLeft, rearRight, frontRight;
     public ColorSensor colorSensor;
     public Gamepad testGamepad;
@@ -51,6 +64,8 @@ public class AllMechs {
     double cY = 0;
     static double width = 0;
 
+    public static double output;
+
     public static int vertTarget;
     public static double lastVertError = 0;
     public static double pv = 0, iv = 0, dv = 0, fv = 0, integralSumVert = 0;
@@ -58,10 +73,10 @@ public class AllMechs {
 
 
     public AllMechs(HardwareMap hardwareMap, int left, int right) {
-        frontLeft = hardwareMap.get(DcMotor.class, "leftfront");
-        rearLeft = hardwareMap.get(DcMotor.class, "leftback");
-        rearRight = hardwareMap.get(DcMotor.class, "rightback");
-        frontRight = hardwareMap.get(DcMotor.class, "rightfront");
+        frontLeft = hardwareMap.get(DcMotor.class, "front left");
+        rearLeft = hardwareMap.get(DcMotor.class, "rear left");
+        rearRight = hardwareMap.get(DcMotor.class, "rear right");
+        frontRight = hardwareMap.get(DcMotor.class, "front right");
 
         // Change this
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -69,10 +84,10 @@ public class AllMechs {
         rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        vert_left = hardwareMap.get(DcMotorEx.class, "vert left");
-        vert_right = hardwareMap.get(DcMotorEx.class, "vert right");
+        vert_left = hardwareMap.get(DcMotorEx.class, "left elevator");
+        vert_right = hardwareMap.get(DcMotorEx.class, "right elevator");
 
-        vert_right.setDirection(DcMotorSimple.Direction.FORWARD);
+        vert_right.setDirection(DcMotorSimple.Direction.REVERSE);
         vert_left.setDirection(DcMotorSimple.Direction.REVERSE);
 
         vert_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -83,9 +98,9 @@ public class AllMechs {
 
         vertTimer = new ElapsedTime();
 
-        colorSensor = hardwareMap.get(ColorSensor.class, "color sensor");
+//        colorSensor = hardwareMap.get(ColorSensor.class, "color sensor");
 
-        intake = hardwareMap.get(DcMotor.class, "intake motor");
+        intake = hardwareMap.get(DcMotor.class, "intake");
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
 
         pooper = hardwareMap.get(Servo.class, "pooper");
@@ -98,6 +113,8 @@ public class AllMechs {
         camera = OpenCvCameraFactory.getInstance().createWebcam(
                 hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId
         );
+        controller_left = new PIDController(p, i, d);
+        controller_right = new PIDController(p, i, d);
 
 //        IMU imu = hardwareMap.get(IMU.class, "imu");
 //        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -185,22 +202,32 @@ public class AllMechs {
     }
 
     public class UpdateVertPID implements Action {
-        double reference = vertTarget;
-        double state = vert_left.getVelocity();
+
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            double error = reference - state;
-            integralSumVert += error * vertTimer.seconds();
-            double derivative = (error - lastVertError) / vertTimer.seconds();
-            lastVertError = error;
+            controller_left.setPID(p, i, d);
+            controller_right.setPID(p, i, d);
 
-            vertTimer.reset();
+            int leftPos = vert_left.getCurrentPosition();
+            int rightPos = vert_right.getCurrentPosition();
+            double pid_left = controller_left.calculate(leftPos, target);
+            double pid_right = controller_right.calculate(rightPos, target);
 
-            double output = (error * pv) + (derivative * dv) + (integralSumVert * iv) + (reference * fv);
+            double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
 
-            vert_left.setPower(output);
-            vert_right.setPower(output);
+            double power_left = pid_left + ff;
+            double power_right = pid_right + ff;
+
+            vert_left.setPower(power_left);
+            vert_right.setPower(power_right);
+
+            telemetry.addData("Right Pos", rightPos);
+            telemetry.addData("Left Pos", leftPos);
+            telemetry.addData("Target", target);
+            telemetry.addData("Left Power", power_left);
+            telemetry.addData("Right Power", power_right);
+            telemetry.update();
 
             return true;
         }
