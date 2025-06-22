@@ -1,14 +1,19 @@
 package org.firstinspires.ftc.teamcode.extraneous;
 
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Config
+@TeleOp(name = "PID Tuner")
 public class PIDFController extends LinearOpMode {
 
-    DcMotorEx arm;
+    public DcMotorEx vert_left, vert_right;
 
     double integralSum = 0;
     double Kp = 0;
@@ -19,15 +24,27 @@ public class PIDFController extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     private double lastError = 0;
 
+    int target = 0;
+
     @Override
     public void runOpMode() throws InterruptedException {
-        arm = hardwareMap.get(DcMotorEx.class, "arm motor");
-        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        vert_left = hardwareMap.get(DcMotorEx.class, "vert left");
+        vert_right = hardwareMap.get(DcMotorEx.class, "vert right");
+
+        vert_right.setDirection(DcMotorSimple.Direction.FORWARD);
+        vert_left.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        vert_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vert_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        vert_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        vert_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
         while (opModeIsActive()) {
-            double power = PIDFControl(1000, arm.getVelocity());
-            arm.setPower(power);
+            double power = PIDFControl(target, vert_left.getVelocity());
+            vert_left.setPower(power);
+            vert_right.setPower(power);
         }
     }
 
@@ -39,8 +56,6 @@ public class PIDFController extends LinearOpMode {
 
         timer.reset();
 
-        double output = (error * Kp) + (derivative * Kd) + (integralSum * Ki) + (reference * Kf);
-
-        return output;
+        return (error * Kp) + (derivative * Kd) + (integralSum * Ki) + (reference * Kf);
     }
 }
