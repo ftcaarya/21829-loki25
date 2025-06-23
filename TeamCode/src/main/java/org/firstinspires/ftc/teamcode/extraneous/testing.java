@@ -24,12 +24,15 @@ public class testing extends OpMode {
     private DcMotor intake;
     private Servo pooper;
 
+    public static final double POOPER_BLOCK = 1;
+    public static final double POOPER_PASS = .4;
+
     @Override
     public void init() {
         colorSensor = hardwareMap.get(ColorSensor.class, "color sensor");
 
-        intake = hardwareMap.get(DcMotor.class, "intake motor");
-        intake.setDirection(DcMotorSimple.Direction.FORWARD);
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         pooper = hardwareMap.get(Servo.class, "pooper");
     }
@@ -71,16 +74,20 @@ public class testing extends OpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
-                pooper.setPosition(.9);
+                pooper.setPosition(POOPER_BLOCK);
                 intake.setPower(0);
                 return false;
-            } else if (greenColor > blueColor && redColor > blueColor) {
-                pooper.setPosition(.9);
-                intake.setPower(.5);
+            } else if ((colorSensor.green() > colorSensor.blue()) && (colorSensor.red() > colorSensor.blue())) {
+                pooper.setPosition(POOPER_BLOCK);
+                intake.setPower(0);
                 return false;
+            } else if (colorSensor.blue() > colorSensor.green() + 50 && colorSensor.blue() > colorSensor.red() + 50) {
+                pooper.setPosition(POOPER_PASS);
+                intake.setPower(.65);
+                return true;
             } else {
-                pooper.setPosition(.1);
-                intake.setPower(.7);
+                pooper.setPosition(POOPER_PASS);
+                intake.setPower(.65);
                 return true;
             }
 
