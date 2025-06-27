@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -17,6 +18,11 @@ public class HardwareTesting extends OpMode {
     public Servo claw, rotate, wrist_left, wrist_right, arm_left, arm_right, hor_left, hor_right, intake_left, intake_right, pooper;
 
     public DcMotor intake;
+
+    public DcMotor frontRight, rearRight, frontLeft, rearLeft;
+    public DcMotorEx rightVert, leftVert;
+
+    public DcMotor test;
 
     public ColorSensor colorSensor;
 
@@ -71,10 +77,22 @@ public class HardwareTesting extends OpMode {
         hor_left = hardwareMap.get(Servo.class, "hor left");
         hor_right = hardwareMap.get(Servo.class, "hor right");
 
-//        intake_left = hardwareMap.get(Servo.class, "intake left");
-//        intake_right = hardwareMap.get(Servo.class, "intake right");
-
         pooper = hardwareMap.get(Servo.class, "pooper");
+
+        intake = hardwareMap.get(DcMotor.class, "intake");
+
+        frontRight = hardwareMap.get(DcMotor.class, "front right");
+        rearRight = hardwareMap.get(DcMotor.class, "rear right");
+        frontLeft = hardwareMap.get(DcMotor.class, "front left");
+        rearLeft = hardwareMap.get(DcMotor.class, "rear left");
+        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftVert = hardwareMap.get(DcMotorEx.class, "left elevator");
+        leftVert.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightVert = hardwareMap.get(DcMotorEx.class, "right elevator");
+        rightVert.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        test = hardwareMap.get(DcMotor.class, "test");
 
 
 
@@ -102,6 +120,16 @@ public void loop() {
         wrist_left.setPosition(wrist_left_up);
     }
 
+    if(gamepad1.x) {
+        wrist_left.setPosition(wrist_left_down);
+        wrist_right.setPosition(wrist_right_down);
+    }
+
+    if(gamepad1.triangle) {
+        wrist_left.setPosition(wrist_left_up);
+        wrist_right.setPosition(wrist_right_up);
+    }
+
     if (gamepad1.dpad_left) {
         hor_left.setPosition(hor_left_extend);
         hor_right.setPosition(hor_right_extend);
@@ -111,6 +139,12 @@ public void loop() {
         hor_right.setPosition(hor_right_retract);
         hor_left.setPosition(hor_left_retract);
     }
+
+    while (gamepad1.right_trigger > 0) {
+        test.setPower(gamepad1.right_trigger);
+    }
+
+    test.setPower(0);
 
 
 }
