@@ -3,8 +3,12 @@ package org.firstinspires.ftc.teamcode.extraneous;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -15,6 +19,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import java.util.ArrayList;
 import java.util.List;
 
+@Config
 @TeleOp(name = "intake testing")
 public class testing extends OpMode {
     private FtcDashboard dash = FtcDashboard.getInstance();
@@ -23,9 +28,15 @@ public class testing extends OpMode {
     private ColorSensor colorSensor;
     private DcMotor intake;
     private Servo pooper;
+    private Servo hold;
 
     public static final double POOPER_BLOCK = 1;
     public static final double POOPER_PASS = .4;
+
+    public static double INTAKE_DOWN = 0.7;
+    public static double INTAKE_UP = 0;
+    public static double pos = 0.7;
+
 
     @Override
     public void init() {
@@ -35,6 +46,7 @@ public class testing extends OpMode {
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         pooper = hardwareMap.get(Servo.class, "pooper");
+        hold = hardwareMap.get(Servo.class, "hold");
     }
 
     @Override
@@ -47,7 +59,10 @@ public class testing extends OpMode {
         telemetry.update();
 
         runningActions.add(
-                checkColorRed()
+                new ParallelAction(
+                        checkColorRed(),
+                        setHold(pos)
+                )
         );
 
 
@@ -63,13 +78,11 @@ public class testing extends OpMode {
         dash.sendTelemetryPacket(packet);
     }
 
+    public Action setHold(double pos) {
+        return new InstantAction(() -> hold.setPosition(pos));
+    }
 
     public class CheckColorRed implements Action {
-
-
-        double redColor = (double) colorSensor.red() / 2;
-        double greenColor = (double) colorSensor.green() / 2;
-        double blueColor = (double) colorSensor.blue() / 2;
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -86,8 +99,8 @@ public class testing extends OpMode {
                 intake.setPower(.65);
                 return true;
             } else {
-                pooper.setPosition(POOPER_PASS);
-                intake.setPower(.65);
+                pooper.setPosition(POOPER_BLOCK);
+                intake.setPower(.6);
                 return true;
             }
 
