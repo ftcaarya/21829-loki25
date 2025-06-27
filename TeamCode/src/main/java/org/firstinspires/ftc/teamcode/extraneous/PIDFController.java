@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
-@TeleOp(name = "PID Tuner")
 public class PIDFController extends LinearOpMode {
 
     public DcMotorEx vert_left, vert_right;
