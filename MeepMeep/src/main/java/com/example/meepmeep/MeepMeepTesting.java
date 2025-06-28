@@ -27,11 +27,11 @@ public class MeepMeepTesting extends MeepMeep {
                 .build();
 
         // red left side
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-35, -63, Math.toRadians(90)))
+//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-35, -63, Math.toRadians(90)))
                 //drop preloaded
-                .setReversed(false)
-                .splineToLinearHeading(new Pose2d(-52, -52 , Math.toRadians(45)), -Math.PI)
-                .strafeToLinearHeading(new Vector2d(-54, -45), Math.toRadians(90))
+//                .setReversed(false)
+//                .splineToLinearHeading(new Pose2d(-52, -52 , Math.toRadians(45)), -Math.PI)
+//                .strafeToLinearHeading(new Vector2d(-54, -45), Math.toRadians(90))
 
                 /*
                     left spike barnacle detected
@@ -99,16 +99,16 @@ public class MeepMeepTesting extends MeepMeep {
 //                .splineToLinearHeading(new Pose2d(-30, -55, Math.toRadians(0)), Math.toRadians(0))
 //
 
-                .build());
+//                .build());
 
 
 //      red right side!!!
-//        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -63, Math.toRadians(270)))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -63, Math.toRadians(270)))
 //                //drop preloaded
-//                        .setTangent(Math.toRadians(110))
-//                .splineToConstantHeading(new Vector2d(0, -35), Math.toRadians(110))
-//                                .setTangent(Math.toRadians(300))
-//                .splineToLinearHeading(new Pose2d(55, -45, Math.toRadians(90)), Math.toRadians(45))
+                        .setTangent(Math.toRadians(110))
+                .splineToConstantHeading(new Vector2d(0, -35), Math.toRadians(110))
+                                .setTangent(Math.toRadians(300))
+                .splineToLinearHeading(new Pose2d(55, -45, Math.toRadians(90)), Math.toRadians(45))
 
 
                 /*
@@ -183,7 +183,7 @@ public class MeepMeepTesting extends MeepMeep {
 
 
 
-//                .build());
+                .build());
 
 
 

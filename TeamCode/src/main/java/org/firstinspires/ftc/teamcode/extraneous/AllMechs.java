@@ -132,7 +132,8 @@ public class AllMechs {
                 upperH,
                 () -> minArea,
                 () -> left, // the left dividing line, in this case the left third of the frame
-                () -> right // the left dividing line, in this case the right third of the frame
+                () -> right, // the left dividing line, in this case the right third of the frame
+                EnhancedColorDetectionProcessor.StartPositions.SAMPLE
         );
 
         visionPortal = new VisionPortal.Builder()

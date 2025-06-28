@@ -47,7 +47,8 @@ public class DetermineBarnacle {
                 upperH,
                 () -> minArea,
                 () -> left,
-                () -> right
+                () -> right,
+                EnhancedColorDetectionProcessor.StartPositions.SPECIMEN
         );
 
         visionPortal = new VisionPortal.Builder()
@@ -80,11 +81,12 @@ public class DetermineBarnacle {
 
     }
 
-    public static void generateTargetTrajectory() {
+    public static void generateTargetTrajectoryLeft() {
 
         // switch through the detected cases and run separate trajectories for each of them.
         switch (recordedBarnaclePosition) {
-            case LEFT:
+            // actually means middle for now
+            case MIDDLE:
                 targetSampleTrajectory = drive.actionBuilder(pose)
                         .turnTo(Math.toRadians(65))
                         // add the intake for the right sample
@@ -109,8 +111,8 @@ public class DetermineBarnacle {
                         // deposit the sample that it has.
                         .build();
                 break;
-
-            case MIDDLE:
+            // actually means left
+            case LEFT:
                 targetSampleTrajectory = drive.actionBuilder(pose)
                         .turnTo(Math.toRadians(65))
                         // intake the sample
@@ -136,6 +138,8 @@ public class DetermineBarnacle {
                         .build();
 
                 break;
+
+                // stays right
             case RIGHT:
                 targetSampleTrajectory = drive.actionBuilder(pose)
                         .turnTo(Math.toRadians(100))
@@ -164,6 +168,132 @@ public class DetermineBarnacle {
                         // deposit the sample that is with the robot
                         .setTangent(Math.toRadians(0))
                         .splineToLinearHeading(new Pose2d(-30, -55, Math.toRadians(0)), Math.toRadians(0))
+                        .build();
+
+
+
+                break;
+
+            case UNFOUND:
+                // just do all of them.
+
+        }
+
+    }
+
+    public static void generateTargetTrajectoryRight() {
+
+        // switch through the detected cases and run separate trajectories for each of them.
+        switch (recordedBarnaclePosition) {
+            // stays left
+            case LEFT:
+                targetSampleTrajectory = drive.actionBuilder(pose)
+                        .turnTo(Math.toRadians(80))
+                        // intake the sample and pass it through
+                        .setTangent(Math.toRadians(290))
+                        .splineToLinearHeading(new Pose2d(59, -52, Math.toRadians(100)), Math.toRadians(290))
+                        // dropped the sample off in the OZ
+                        .setTangent(Math.PI/2)
+                        .splineToLinearHeading(new Pose2d(59, -42, Math.toRadians(60)), Math.toRadians(90))
+                        // intake the sample and pass it through
+                        .setTangent(Math.toRadians(180))
+                        .splineToLinearHeading(new Pose2d(57, -62, Math.toRadians(-270)), Math.toRadians(270))
+                        // dropped the sample off in the OZ
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(150))
+                        .splineToLinearHeading(new Pose2d(-5, -35, Math.toRadians(270)), Math.toRadians(100))
+                        // score specimen that is with the robot
+                        .setTangent(Math.toRadians(320))
+                        .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(320-180))
+                        .splineToConstantHeading(new Vector2d(3, -35), Math.toRadians(320-180))
+                        // score specimen that is with the robot
+                        .setTangent(Math.toRadians(320))
+                        .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(150))
+                        .splineToConstantHeading(new Vector2d(-3, -35), Math.toRadians(150))
+                        // score specimen that is with the robot
+                        .setTangent(Math.toRadians(230))
+
+                        // go park
+                        .splineToLinearHeading(new Pose2d(-37, -35, Math.toRadians(180)), Math.toRadians(180))
+
+                        .build();
+                break;
+            // actually means right
+            // supposed to be the middle
+            case RIGHT:
+                targetSampleTrajectory = drive.actionBuilder(pose)
+                        .turnTo(Math.toRadians(110))
+                        // intake the sample and pass it through
+                        .setTangent(Math.toRadians(270))
+                        .splineToLinearHeading(new Pose2d(54, -55, Math.toRadians(60)), Math.toRadians(270))
+                        // dropped the sample in the OZ
+                        .setTangent(Math.toRadians(60))
+                        .splineToConstantHeading(new Vector2d(59, -42), Math.toRadians(60))
+                        // intake the sample and pass it through
+                        .setTangent(Math.toRadians(180 + 60))
+                        .splineToLinearHeading(new Pose2d(54, -62, Math.toRadians(90)), Math.toRadians(270))
+                        // dropped the sample in the OZ
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(140))
+                        .splineToLinearHeading(new Pose2d(-5, -35, Math.toRadians(270)), Math.toRadians(100))
+                        // score the specimen that is with the robot
+                        .setTangent(Math.toRadians(320))
+                        .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(320-180))
+                        .splineToConstantHeading(new Vector2d(3, -35), Math.toRadians(320-180))
+                        // score the specimen that is with the robot
+                        .setTangent(Math.toRadians(320))
+                        .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(150))
+                        .splineToConstantHeading(new Vector2d(-3, -35), Math.toRadians(150))
+                        // score the specimen that is with the robot
+                        .setTangent(Math.toRadians(230))
+
+                        // go park bum!
+                        .splineToLinearHeading(new Pose2d(-20, -35, Math.toRadians(180)), Math.toRadians(180))
+
+                        .build();
+
+                break;
+
+                // actually middle
+            // supposed to be the right
+            case MIDDLE:
+                targetSampleTrajectory = drive.actionBuilder(pose)
+                        .turnTo(Math.toRadians(80))
+                        // intake the sample and pass it through
+                        .setTangent(Math.toRadians(270))
+                        .splineToLinearHeading(new Pose2d(55, -55, Math.toRadians(105)), Math.toRadians(270))
+                        // dropped the sample off in the OZ
+                        .setTangent(Math.toRadians(90))
+                        .splineToLinearHeading(new Pose2d(55, -45, Math.toRadians(105)), Math.toRadians(90))
+                        // intake the sample and pass it through
+                        .setTangent(Math.toRadians(270))
+                        .splineToLinearHeading(new Pose2d(55, -59, Math.toRadians(90)), Math.toRadians(270))
+                        // dropped the sample off in the OZ
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(140))
+                        .splineToLinearHeading(new Pose2d(-5, -35, Math.toRadians(270)), Math.toRadians(100))
+                        // score the specimen that is with the robot
+                        .setTangent(Math.toRadians(320))
+                        .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(320-180))
+                        .splineToConstantHeading(new Vector2d(3, -35), Math.toRadians(320-180))
+                        // score the specimen that is with the robot
+                        .setTangent(Math.toRadians(320))
+                        .splineToConstantHeading(new Vector2d(40, -62), Math.toRadians(270))
+                        // pick up spec from wall
+                        .setTangent(Math.toRadians(150))
+                        .splineToConstantHeading(new Vector2d(-3, -35), Math.toRadians(150))
+                        // score the specimen that is with the robot
+                        // in parking already YAYAYAYAYYAYAY!!!
                         .build();
 
 

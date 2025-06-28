@@ -45,6 +45,7 @@ public class EnhancedColorDetectionProcessor implements VisionProcessor, CameraS
     private MatOfPoint mostSaturatedContour;
     private PropPositions previousPropPosition;
     private PropPositions recordedPropPosition = PropPositions.UNFOUND;
+    private StartPositions startPosition;
 
 
     /**
@@ -56,13 +57,14 @@ public class EnhancedColorDetectionProcessor implements VisionProcessor, CameraS
      * @param left    the dividing point for the prop to be on the left
      * @param right   the diving point for the prop to be on the right
      */
-    public EnhancedColorDetectionProcessor(double lowerH, double upperH, DoubleSupplier minArea, DoubleSupplier left, DoubleSupplier right) {
+    public EnhancedColorDetectionProcessor(double lowerH, double upperH, DoubleSupplier minArea, DoubleSupplier left, DoubleSupplier right, StartPositions startPosition) {
         this.contours = new ArrayList<>();
         this.lower = new Scalar(lowerH, 0, 0);
         this.upper = new Scalar(upperH, 255, 255);
         this.minArea = minArea;
         this.left = left;
         this.right = right;
+//        this.startPosition = startPosition;
 
         // setting up the paint for the text in the center of the box
         textPaint = new TextPaint();
@@ -186,9 +188,27 @@ public class EnhancedColorDetectionProcessor implements VisionProcessor, CameraS
 
         // determines the current prop position, using the left and right dividers we gave earlier
         // if we didn't find any contours which were large enough, sets it to be unfound
-        PropPositions propPosition;
+        PropPositions propPosition = PropPositions.UNFOUND;
+//        if (startPosition == StartPositions.SAMPLE) {
+//            if (mostSaturatedContourX < left.getAsDouble()) {
+//                propPosition = PropPositions.LEFT;
+//            } else if (mostSaturatedContourX > right.getAsDouble()) {
+//                propPosition = PropPositions.RIGHT;
+//            } else {
+//                propPosition = PropPositions.MIDDLE;
+//            }
+//        } else if (startPosition == StartPositions.SPECIMEN) {
+//            if (mostSaturatedContourX < left.getAsDouble()) {
+//                propPosition = PropPositions.LEFT;
+//            } else if (mostSaturatedContourX > right.getAsDouble()) {
+//                propPosition = PropPositions.RIGHT;
+//            } else {
+//                propPosition = PropPositions.MIDDLE;
+//            }
+//        }
+
         if (mostSaturatedContour == null) {
-            propPosition = PropPositions.UNFOUND;
+            propPosition = PropPositions.MIDDLE;
         } else if (mostSaturatedContourX < left.getAsDouble()) {
             propPosition = PropPositions.LEFT;
         } else if (mostSaturatedContourX > right.getAsDouble()) {
@@ -279,6 +299,11 @@ public class EnhancedColorDetectionProcessor implements VisionProcessor, CameraS
         LEFT,
         MIDDLE,
         RIGHT,
-        UNFOUND;
+        UNFOUND
+    }
+
+    public enum StartPositions {
+        SAMPLE,
+        SPECIMEN
     }
 }
