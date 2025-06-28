@@ -77,6 +77,7 @@ public class MeepMeepTesting extends MeepMeep {
                 /*
                     right spike barnacle detected
                  */
+//                        .turnTo(Math.toRadians(100))
 //                .setTangent(Math.toRadians(180 + 120))
 //                .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), Math.toRadians(180 + 120))
 //                        .setTangent((Math.PI - Math.atan((18/14.5))))
@@ -97,7 +98,7 @@ public class MeepMeepTesting extends MeepMeep {
 //                .setTangent(Math.toRadians(0))
 //                .splineToLinearHeading(new Pose2d(-30, -55, Math.toRadians(0)), Math.toRadians(0))
 //
-//
+
                 .build());
 
 

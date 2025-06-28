@@ -36,7 +36,7 @@ public class EnhancedColorDetectionOpmode extends OpMode {
                 upperH,
                 () -> minArea,
                 () -> 213, // the left dividing line, in this case the left third of the frame
-                () -> 426 // the left dividing line, in this case the right third of the frame
+                () -> 426 // the right dividing line, in this case the right third of the frame
         );
 
         // Start the camera
