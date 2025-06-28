@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.extraneous;
+package org.firstinspires.ftc.teamcode.extraneous.hardware;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
