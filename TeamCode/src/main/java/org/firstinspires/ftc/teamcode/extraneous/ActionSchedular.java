@@ -10,6 +10,7 @@ import java.util.Queue;
 
 public class ActionSchedular {
     final Queue<Action> actions = new LinkedList<>();
+
     final FtcDashboard dash = FtcDashboard.getInstance();
     final Canvas canvas = new Canvas();
 
@@ -29,6 +30,15 @@ public class ActionSchedular {
             if (!running) {
                 actions.remove();
             }
+        }
+    }
+
+    public void runEndless() {
+        if (actions.peek() != null) {
+            TelemetryPacket packet = new TelemetryPacket();
+            packet.fieldOverlay().getOperations().addAll(canvas.getOperations());
+
+            dash.sendTelemetryPacket(packet);
         }
     }
 

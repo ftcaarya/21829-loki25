@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -22,6 +23,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.internal.opmode.BlocksClassFilter;
+import org.firstinspires.ftc.teamcode.extraneous.hardware.testing;
 import org.firstinspires.ftc.teamcode.vision.EnhancedColorDetectionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -32,6 +35,42 @@ public class AllMechs {
     public  PIDController controller_right;
 
     public MultipleTelemetry telemetry;
+
+    public Servo claw, rotate, wrist_left, wrist_right, arm_left, arm_right, hor_left, hor_right, hold, pooper;
+
+    public static final double hor_left_extend = 0.53;
+    public static final double hor_left_retract = 0.25;
+
+    public static final double hor_right_extend = 47;
+    public static final double hor_right_retract = .75;
+
+    public static final double POOPER_BLOCK = 1;
+    public static final double POOPER_PASS = .4;
+
+    public static final double CLAW_OPEN = 1;
+    public static final double CLAW_CLOSE = 0.25;
+
+    public static double wrist_left_down = 1;
+    public static double wrist_left_up = 0;
+
+    public static double wrist_right_down = 0;
+    public static double wrist_right_up = 1;
+    public static double intake_left_down = 0;
+    public static double intake_left_up = 1;
+
+    public static double intake_right_down = 0;
+    public static double intake_right_up = .5;
+
+    public static final double arm_left_up = .5;
+    public static final double arm_left_down = .5;
+
+    public static final double arm_right_up = .5;
+    public static final double arm_right_down = .5;
+
+    public static final double rotate_hor = 0.22;
+    public static final double rotate_vert = 0.55;
+
+    public static double intake_up = 1;
 
     public static double p = 0, i = 0, d = 0;
     public static double f = 0;
@@ -47,7 +86,6 @@ public class AllMechs {
     public ElapsedTime vertTimer;
 
     public DcMotor intake;
-    public Servo pooper;
 
     public VisionPortal visionPortal;
     public EnhancedColorDetectionProcessor colourMassDetectionProcessor;
@@ -73,16 +111,32 @@ public class AllMechs {
 
 
     public AllMechs(HardwareMap hardwareMap, int left, int right) {
+        claw = hardwareMap.get(Servo.class, "claw");
+        rotate = hardwareMap.get(Servo.class, "rotate");
+
+        wrist_left = hardwareMap.get(Servo.class, "wrist left");
+        wrist_right = hardwareMap.get(Servo.class, "wrist right");
+
+        arm_left = hardwareMap.get(Servo.class, "arm left");
+        arm_right = hardwareMap.get(Servo.class, "arm right");
+
+        hor_left = hardwareMap.get(Servo.class, "hor left");
+        hor_right = hardwareMap.get(Servo.class, "hor right");
+
+        pooper = hardwareMap.get(Servo.class, "pooper");
+
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        hold = hardwareMap.get(Servo.class, "hold");
+
+
+        frontRight = hardwareMap.get(DcMotor.class, "front right");
+        rearRight = hardwareMap.get(DcMotor.class, "rear right");
         frontLeft = hardwareMap.get(DcMotor.class, "front left");
         rearLeft = hardwareMap.get(DcMotor.class, "rear left");
-        rearRight = hardwareMap.get(DcMotor.class, "rear right");
-        frontRight = hardwareMap.get(DcMotor.class, "front right");
-
-        // Change this
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        rearLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        rearRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        rearLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         vert_left = hardwareMap.get(DcMotorEx.class, "left elevator");
         vert_right = hardwareMap.get(DcMotorEx.class, "right elevator");
@@ -95,6 +149,8 @@ public class AllMechs {
 
         vert_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         vert_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        colorSensor = hardwareMap.get(ColorSensor.class, "color sensor");
 
         vertTimer = new ElapsedTime();
 
@@ -141,62 +197,7 @@ public class AllMechs {
                 .build();
     }
 
-    public class CheckColorRed implements Action {
 
-
-        double redColor = (double) colorSensor.red() / 2;
-        double greenColor = (double) colorSensor.green() / 2;
-        double blueColor = (double) colorSensor.blue() / 2;
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
-                pooper.setPosition(0);
-                intake.setPower(0);
-                return false;
-            } else if (greenColor > blueColor && redColor > blueColor) {
-                pooper.setPosition(0);
-                intake.setPower(0);
-                return false;
-            } else {
-                pooper.setPosition(1);
-                intake.setPower(1);
-                return true;
-            }
-
-        }
-    }
-
-    public Action checkColorRed() {
-        return new CheckColorRed();
-    }
-
-    public Action checkColor() {
-        double redColor = (double) colorSensor.red() / 2;
-        double greenColor = (double) colorSensor.green() / 2;
-        double blueColor = (double) colorSensor.blue() / 2;
-
-
-        if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
-            return new ParallelAction(
-                    new InstantAction(() -> testGamepad.rumbleBlips(1)),
-                    new InstantAction(() ->  testGamepad.setLedColor(255, 0, 0, 5000))
-            );
-        } else if (greenColor > blueColor && redColor > blueColor) {
-            return new ParallelAction(
-                    new InstantAction(() -> testGamepad.rumbleBlips(2)),
-                    new InstantAction(() -> testGamepad.setLedColor(230, 230, 0, 5000))
-            );
-
-        } else if (colorSensor.blue() > colorSensor.red() + 50 && blueColor > greenColor) {
-            return new ParallelAction(
-                    new InstantAction(() -> testGamepad.rumbleBlips(3)),
-                    new InstantAction(() -> testGamepad.setLedColor(0, 0, 225, 5000))
-            );
-        } else {
-            return new InstantAction(() -> testGamepad.stopRumble());
-        }
-    }
 
     public Action setVertTarget(int target) {
         return new InstantAction(() -> vertTarget = target);
@@ -239,5 +240,63 @@ public class AllMechs {
     }
 
 
+    public Action intakeDown() {
+        return new InstantAction(() -> hold.setPosition(.8));
+    }
+
+    public Action intakeUp() {
+        return new InstantAction(() -> hold.setPosition(.3));
+    }
+
+
+    public class CheckColorRed implements Action {
+        Gamepad gamepad1 = new Gamepad();
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
+                pooper.setPosition(POOPER_BLOCK);
+                intake.setPower(0);
+                return false;
+            } else if ((colorSensor.green() > colorSensor.blue()) && (colorSensor.red() > colorSensor.blue())) {
+                pooper.setPosition(POOPER_BLOCK);
+                intake.setPower(0);
+                return false;
+            } else if (colorSensor.blue() > colorSensor.green() + 50 && colorSensor.blue() > colorSensor.red() + 50) {
+                pooper.setPosition(POOPER_PASS);
+                intake.setPower(.65);
+                return true;
+            } else if (gamepad1.square) {
+                pooper.setPosition(POOPER_BLOCK);
+                hold.setPosition(.3);
+                intake.setPower(0);
+                return false;
+            } else {
+                pooper.setPosition(POOPER_BLOCK);
+                intake.setPower(.6);
+                return true;
+            }
+
+        }
+
+    }
+
+    public Action checkColorRed() {
+        return new CheckColorRed();
+    }
+
+    public Action stopIntake() {
+        return new ParallelAction(
+                new InstantAction(() -> pooper.setPosition(POOPER_BLOCK)),
+                new InstantAction(() -> intake.setPower(0))
+        );
+    }
+
+    public Action armUp() {
+        return new ParallelAction(
+                new InstantAction(() -> arm_left.setPosition(arm_left_up)),
+                new InstantAction(() -> arm_right.setPosition(arm_right_up))
+        );
+    }
 
 }
