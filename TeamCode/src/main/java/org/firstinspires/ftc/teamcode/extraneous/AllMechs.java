@@ -38,11 +38,11 @@ public class AllMechs {
 
     public Servo claw, rotate, wrist_left, wrist_right, arm_left, arm_right, hor_left, hor_right, hold, pooper;
 
-    public static final double hor_left_extend = 0.53;
-    public static final double hor_left_retract = 0.25;
+    public static double hor_left_extend = 0.6;
+    public static double hor_left_retract = 0.32;
 
-    public static final double hor_right_extend = 47;
-    public static final double hor_right_retract = .75;
+    public static double hor_right_extend = 0.32;
+    public static double hor_right_retract = .6;
 
     public static final double POOPER_BLOCK = 1;
     public static final double POOPER_PASS = .4;
@@ -264,7 +264,7 @@ public class AllMechs {
                 return false;
             } else if (colorSensor.blue() > colorSensor.green() + 50 && colorSensor.blue() > colorSensor.red() + 50) {
                 pooper.setPosition(POOPER_PASS);
-                intake.setPower(.65);
+                intake.setPower(-.65);
                 return true;
             } else if (gamepad1.square) {
                 pooper.setPosition(POOPER_BLOCK);
@@ -273,7 +273,7 @@ public class AllMechs {
                 return false;
             } else {
                 pooper.setPosition(POOPER_BLOCK);
-                intake.setPower(.6);
+                intake.setPower(-.6);
                 return true;
             }
 
@@ -298,5 +298,57 @@ public class AllMechs {
                 new InstantAction(() -> arm_right.setPosition(arm_right_up))
         );
     }
+    public Action armDown() {
+        return new ParallelAction(
+                new InstantAction(() -> arm_left.setPosition(arm_left_down)),
+                new InstantAction(() -> arm_right.setPosition(arm_right_down))
+        );
+    }
+    public Action wristUp() {
+        return new ParallelAction(
+                new InstantAction(() -> wrist_left.setPosition(wrist_left_up)),
+                new InstantAction(() -> wrist_right.setPosition(wrist_right_up))
+        );
+    }
+    public Action wristDown() {
+        return new ParallelAction(
+                new InstantAction(() -> wrist_left.setPosition(wrist_left_down)),
+                new InstantAction(() -> wrist_right.setPosition(wrist_right_down))
+        );
+    }
+
+    public Action clawClose() {
+        return new InstantAction(() -> claw.setPosition(CLAW_CLOSE));
+
+    }
+    public Action clawOpen() {
+        return new InstantAction(() -> claw.setPosition(CLAW_OPEN));
+
+    }
+    public Action rotateHor() {
+        return new InstantAction(() -> rotate.setPosition(rotate_hor));
+
+    }
+    public Action rotateVert() {
+        return new InstantAction(() -> rotate.setPosition(rotate_vert));
+
+    }
+    public Action horExtend() {
+        return new ParallelAction(
+                new InstantAction(() -> hor_left.setPosition(hor_left_extend)),
+                new InstantAction(() -> hor_right.setPosition(hor_right_extend))
+        );
+    }
+    public Action horRetract() {
+        return new ParallelAction(
+                new InstantAction(() -> hor_left.setPosition(hor_left_retract)),
+                new InstantAction(() -> hor_right.setPosition(hor_right_retract))
+        );
+    }
+
+
+
+
+
 
 }
