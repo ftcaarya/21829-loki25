@@ -45,20 +45,15 @@ public class TeleOpTesting extends LinearOpMode {
 
 
 
-                if (gamepad1.dpad_down) {
+                if (gamepad1.a) {
                     actionSchedular.addAction(new ParallelAction(
                             robot.intakeDown(),
                             robot.checkColorRed(gamepad1)
                     ));
                 }
 
-                if (gamepad1.dpad_up) {
-                    actionSchedular.addAction(
-                            new ParallelAction()
-                    );
-                }
 
-                if (gamepad1.dpad_up) {
+                if (gamepad1.b) {
                     actionSchedular.addAction(new ParallelAction(
                             robot.intakeUp(),
                             robot.stopIntake()
@@ -66,17 +61,61 @@ public class TeleOpTesting extends LinearOpMode {
                     );
                 }
 
-                if (gamepad1.dpad_up) {
+                if (gamepad1.dpad_left) {
                     actionSchedular.addAction(
                             robot.armUp()
                     );
                 }
 
-                if (gamepad1.dpad_up) {
+                if (gamepad1.dpad_right) {
                     actionSchedular.addAction(
-                            robot.armUp()
+                            robot.armDown()
                     );
                 }
+                if (gamepad1.right_bumper) {
+                    actionSchedular.addAction(
+                            robot.clawClose()
+                    );
+                }
+                if (gamepad1.left_bumper) {
+                    actionSchedular.addAction(
+                            robot.clawOpen()
+                    );
+                }
+                if (gamepad1.dpad_up) {
+                    actionSchedular.addAction(
+                            robot.wristUp()
+                    );
+                }
+
+                if (gamepad1.dpad_down) {
+                    actionSchedular.addAction(
+                            robot.wristDown()
+                    );
+                }
+                if (gamepad1.x) {
+                    actionSchedular.addAction(
+                            robot.rotateHor()
+                    );
+                }
+                if (gamepad1.y) {
+                    actionSchedular.addAction(
+                            robot.rotateVert()
+                    );
+                }
+                if (gamepad2.dpad_up) {
+                    actionSchedular.addAction(
+                            robot.setVertTarget(1000)
+                    );
+                }
+                if (gamepad2.dpad_down) {
+                    actionSchedular.addAction(
+                            robot.setVertTarget(0)
+                    );
+                }
+
+
+
 
                 actionSchedular.run();
             }
