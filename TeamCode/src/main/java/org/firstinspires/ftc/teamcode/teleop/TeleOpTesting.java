@@ -48,7 +48,7 @@ public class TeleOpTesting extends LinearOpMode {
                 if (gamepad1.dpad_down) {
                     actionSchedular.addAction(new ParallelAction(
                             robot.intakeDown(),
-                            robot.checkColorRed()
+                            robot.checkColorRed(gamepad1)
                     ));
                 }
 

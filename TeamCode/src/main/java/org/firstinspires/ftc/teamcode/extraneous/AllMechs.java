@@ -248,12 +248,10 @@ public class AllMechs {
         return new InstantAction(() -> hold.setPosition(.3));
     }
 
+    public Action checkColorRed(Gamepad gamepad) {
+        return p -> {
+            hold.setPosition(.8);
 
-    public class CheckColorRed implements Action {
-        Gamepad gamepad1 = new Gamepad();
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
                 pooper.setPosition(POOPER_BLOCK);
                 intake.setPower(0);
@@ -266,7 +264,7 @@ public class AllMechs {
                 pooper.setPosition(POOPER_PASS);
                 intake.setPower(.65);
                 return true;
-            } else if (gamepad1.square) {
+            } else if (gamepad.square) {
                 pooper.setPosition(POOPER_BLOCK);
                 hold.setPosition(.3);
                 intake.setPower(0);
@@ -276,14 +274,45 @@ public class AllMechs {
                 intake.setPower(.6);
                 return true;
             }
-
-        }
-
+        };
     }
 
-    public Action checkColorRed() {
-        return new CheckColorRed();
-    }
+//    public class CheckColorRed implements Action {
+//
+//        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//
+//            hold.setPosition(.8);
+//
+//            if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
+//                pooper.setPosition(POOPER_BLOCK);
+//                intake.setPower(0);
+//                return false;
+//            } else if ((colorSensor.green() > colorSensor.blue()) && (colorSensor.red() > colorSensor.blue())) {
+//                pooper.setPosition(POOPER_BLOCK);
+//                intake.setPower(0);
+//                return false;
+//            } else if (colorSensor.blue() > colorSensor.green() + 50 && colorSensor.blue() > colorSensor.red() + 50) {
+//                pooper.setPosition(POOPER_PASS);
+//                intake.setPower(.65);
+//                return true;
+//            } else if (gamepad1.square) {
+//                pooper.setPosition(POOPER_BLOCK);
+//                hold.setPosition(.3);
+//                intake.setPower(0);
+//                return false;
+//            } else {
+//                pooper.setPosition(POOPER_BLOCK);
+//                intake.setPower(.6);
+//                return true;
+//            }
+//
+//        }
+//
+//    }
+//
+//    public Action checkColorRed() {
+//        return new CheckColorRed();
+//    }
 
     public Action stopIntake() {
         return new ParallelAction(
