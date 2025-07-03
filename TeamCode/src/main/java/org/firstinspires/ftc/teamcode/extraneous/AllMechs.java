@@ -31,18 +31,17 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
 public class AllMechs {
-    public PIDController controller_left;
     public  PIDController controller_right;
 
     public MultipleTelemetry telemetry;
 
     public Servo claw, rotate, wrist_left, wrist_right, arm_left, arm_right, hor_left, hor_right, hold, pooper;
 
-    public static double hor_left_extend = 0.6;
-    public static double hor_left_retract = 0.32;
+    public static double hor_left_extend = 0.5;
+    public static double hor_left_retract = 0.37;
 
-    public static double hor_right_extend = 0.32;
-    public static double hor_right_retract = .6;
+    public static double hor_right_extend = 0.4;
+    public static double hor_right_retract = .63;
 
     public static final double POOPER_BLOCK = 1;
     public static final double POOPER_PASS = .4;
@@ -55,25 +54,26 @@ public class AllMechs {
 
     public static double wrist_right_down = 0;
     public static double wrist_right_up = 1;
-    public static double intake_left_down = 0;
-    public static double intake_left_up = 1;
 
-    public static double intake_right_down = 0;
-    public static double intake_right_up = .5;
+    public static double arm_left_up = .8;
+    public static double arm_left_down = 0.32;
 
-    public static final double arm_left_up = .5;
-    public static final double arm_left_down = .5;
+    public static double arm_right_up = 0.2;
+    public static double arm_right_down = 0.68;
 
-    public static final double arm_right_up = .5;
-    public static final double arm_right_down = .5;
+    public static double arm_left_wait = 0.42;
+
+    public static double arm_right_wait = 0.58;
+
 
     public static final double rotate_hor = 0.22;
     public static final double rotate_vert = 0.55;
 
-    public static double intake_up = 1;
+    public static double intake_up = .3;
+    public static double intake_down = .8;
 
-    public static double p = 0, i = 0, d = 0;
-    public static double f = 0;
+    public static double p = 0.02, i = 0, d = 0.00065;
+    public static double f = 0.05;
     public static int target = 0;
     public final double ticks_in_degree = 700/180.0;
 
@@ -81,6 +81,9 @@ public class AllMechs {
     public ColorSensor colorSensor;
     public Gamepad testGamepad;
     public IMU imu;
+
+    public Gamepad gamepad1;
+    public Gamepad gamepad2;
 
     public DcMotorEx vert_left, vert_right;
     public ElapsedTime vertTimer;
@@ -105,12 +108,10 @@ public class AllMechs {
     public static double output;
 
     public static int vertTarget;
-    public static double lastVertError = 0;
-    public static double pv = 0, iv = 0, dv = 0, fv = 0, integralSumVert = 0;
 
 
 
-    public AllMechs(HardwareMap hardwareMap, int left, int right) {
+    public AllMechs(HardwareMap hardwareMap, int left, int right, Gamepad gamepad1, Gamepad gamepad2) {
         claw = hardwareMap.get(Servo.class, "claw");
         rotate = hardwareMap.get(Servo.class, "rotate");
 
@@ -129,6 +130,9 @@ public class AllMechs {
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         hold = hardwareMap.get(Servo.class, "hold");
+
+        this.gamepad1 = gamepad1;
+        this.gamepad2 = gamepad2;
 
 
         frontRight = hardwareMap.get(DcMotor.class, "front right");
@@ -169,7 +173,6 @@ public class AllMechs {
         camera = OpenCvCameraFactory.getInstance().createWebcam(
                 hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId
         );
-        controller_left = new PIDController(p, i, d);
         controller_right = new PIDController(p, i, d);
 
 //        IMU imu = hardwareMap.get(IMU.class, "imu");
@@ -197,60 +200,39 @@ public class AllMechs {
                 .build();
     }
 
-
-
     public Action setVertTarget(int target) {
         return new InstantAction(() -> vertTarget = target);
     }
 
-    public class UpdateVertPID implements Action {
-
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            controller_left.setPID(p, i, d);
+    public Action updateVertPID() {
+        return packet -> {
             controller_right.setPID(p, i, d);
 
-            int leftPos = vert_left.getCurrentPosition();
             int rightPos = vert_right.getCurrentPosition();
-            double pid_left = controller_left.calculate(leftPos, target);
-            double pid_right = controller_right.calculate(rightPos, target);
+            double pid_right = controller_right.calculate(rightPos, vertTarget);
 
-            double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
+            double ff = Math.cos(Math.toRadians(vertTarget / ticks_in_degree)) * f;
 
-            double power_left = pid_left + ff;
             double power_right = pid_right + ff;
 
-            vert_left.setPower(power_left);
+            vert_left.setPower(power_right);
             vert_right.setPower(power_right);
 
-            telemetry.addData("Right Pos", rightPos);
-            telemetry.addData("Left Pos", leftPos);
-            telemetry.addData("Target", target);
-            telemetry.addData("Left Power", power_left);
-            telemetry.addData("Right Power", power_right);
-            telemetry.update();
-
             return true;
-        }
+        };
     }
-
-    public Action updateVertPID() {
-        return new UpdateVertPID();
-    }
-
 
     public Action intakeDown() {
-        return new InstantAction(() -> hold.setPosition(.8));
+        return new InstantAction(() -> hold.setPosition(.87));
     }
 
     public Action intakeUp() {
         return new InstantAction(() -> hold.setPosition(.3));
     }
 
-    public Action checkColorRed(Gamepad gamepad) {
+    public Action checkColorRed() {
         return p -> {
-            hold.setPosition(.8);
+            hold.setPosition(.87);
 
             if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
                 pooper.setPosition(POOPER_BLOCK);
@@ -262,57 +244,20 @@ public class AllMechs {
                 return false;
             } else if (colorSensor.blue() > colorSensor.green() + 50 && colorSensor.blue() > colorSensor.red() + 50) {
                 pooper.setPosition(POOPER_PASS);
-                intake.setPower(-.65);
+                intake.setPower(-.9);
                 return true;
-            } else if (gamepad.square) {
+            } else if (gamepad1.square) {
                 pooper.setPosition(POOPER_BLOCK);
                 hold.setPosition(.3);
                 intake.setPower(0);
                 return false;
             } else {
                 pooper.setPosition(POOPER_BLOCK);
-                intake.setPower(-.6);
+                intake.setPower(-.9);
                 return true;
             }
         };
     }
-
-//    public class CheckColorRed implements Action {
-//
-//        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-//
-//            hold.setPosition(.8);
-//
-//            if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
-//                pooper.setPosition(POOPER_BLOCK);
-//                intake.setPower(0);
-//                return false;
-//            } else if ((colorSensor.green() > colorSensor.blue()) && (colorSensor.red() > colorSensor.blue())) {
-//                pooper.setPosition(POOPER_BLOCK);
-//                intake.setPower(0);
-//                return false;
-//            } else if (colorSensor.blue() > colorSensor.green() + 50 && colorSensor.blue() > colorSensor.red() + 50) {
-//                pooper.setPosition(POOPER_PASS);
-//                intake.setPower(.65);
-//                return true;
-//            } else if (gamepad1.square) {
-//                pooper.setPosition(POOPER_BLOCK);
-//                hold.setPosition(.3);
-//                intake.setPower(0);
-//                return false;
-//            } else {
-//                pooper.setPosition(POOPER_BLOCK);
-//                intake.setPower(.6);
-//                return true;
-//            }
-//
-//        }
-//
-//    }
-//
-//    public Action checkColorRed() {
-//        return new CheckColorRed();
-//    }
 
     public Action stopIntake() {
         return new ParallelAction(
@@ -374,10 +319,11 @@ public class AllMechs {
                 new InstantAction(() -> hor_right.setPosition(hor_right_retract))
         );
     }
-
-
-
-
-
+    public Action armWait(){
+        return new ParallelAction(
+               new InstantAction(()-> arm_right.setPosition(arm_right_wait)),
+                new InstantAction(()-> arm_left.setPosition(arm_left_wait))
+        );
+    }
 
 }

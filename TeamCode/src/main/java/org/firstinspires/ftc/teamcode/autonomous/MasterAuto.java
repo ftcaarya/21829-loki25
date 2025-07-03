@@ -37,4 +37,5 @@ public abstract class MasterAuto extends LinearOpMode {
     }
 
     protected abstract Action onRun();
+    protected void onInit() {};
 }
