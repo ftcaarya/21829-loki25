@@ -13,23 +13,35 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.extraneous.ActionSchedular;
 import org.firstinspires.ftc.teamcode.extraneous.DetermineBarnacle;
+import org.opencv.core.Mat;
 
 @Autonomous(name = "Sample Side Auto")
 public class SampleAuto extends MasterAuto {
     ActionSchedular actionSchedular;
+    DetermineBarnacle determineBarnacle;
+    Pose2d startPose = new Pose2d(-35, -63, Math.toRadians(90));
+    Pose2d passPose = new Pose2d(-54, -45, Math.toRadians(90));
+    
 
     SampleAuto() {
         actionSchedular = new ActionSchedular();
     }
 
+    @Override
+    protected void onInit() {
+        determineBarnacle = new DetermineBarnacle(1000, 100, 200, passPose);
+    }
+
     protected Action onRun() {
-        TrajectoryActionBuilder builder = drive.actionBuilder(new Pose2d(-35, -63, Math.toRadians(90)));
+        TrajectoryActionBuilder builder = drive.actionBuilder(startPose);
 
         builder = wholeSequence(builder);
 
 
         return builder.build();
     }
+
+
 
     private TrajectoryActionBuilder wholeSequence(TrajectoryActionBuilder builder) {
         builder = builder

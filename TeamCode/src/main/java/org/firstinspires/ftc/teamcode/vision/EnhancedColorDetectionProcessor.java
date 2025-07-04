@@ -51,16 +51,14 @@ public class EnhancedColorDetectionProcessor implements VisionProcessor, CameraS
     /**
      * Uses HSVs for the scalars
      *
-     * @param lowerH  the lower masked bound, a H value from HSV, if lowerH is higher than higherH, it will wrap through 0
-     * @param upperH  the upper masked bound, a H value from HSV, if higherH is lower than lowerH, it will wrap through 0
      * @param minArea the minimum area for a detected blob to be considered the prop
      * @param left    the dividing point for the prop to be on the left
      * @param right   the diving point for the prop to be on the right
      */
-    public EnhancedColorDetectionProcessor(double lowerH, double upperH, DoubleSupplier minArea, DoubleSupplier left, DoubleSupplier right, StartPositions startPosition) {
+    public EnhancedColorDetectionProcessor(DoubleSupplier minArea, DoubleSupplier left, DoubleSupplier right, StartPositions startPosition) {
         this.contours = new ArrayList<>();
-        this.lower = new Scalar(lowerH, 0, 0);
-        this.upper = new Scalar(upperH, 255, 255);
+        lower = new Scalar(0, 0, 150);
+        upper = new Scalar(180, 40, 255);
         this.minArea = minArea;
         this.left = left;
         this.right = right;

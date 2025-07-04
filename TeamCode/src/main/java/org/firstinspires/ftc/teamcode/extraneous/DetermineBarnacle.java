@@ -39,12 +39,10 @@ public class DetermineBarnacle {
 
     static Pose2d pose;
 
-    DetermineBarnacle(double lowerH, double upperH, double minArea, int left, int right, Pose2d poseGiven) {
+    public DetermineBarnacle(double minArea, double left, double right, Pose2d poseGiven) {
         this.pose = poseGiven;
 
         colourMassDetectionProcessor = new EnhancedColorDetectionProcessor(
-                lowerH,
-                upperH,
                 () -> minArea,
                 () -> left,
                 () -> right,
