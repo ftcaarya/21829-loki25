@@ -187,8 +187,7 @@ public class AllMechs {
         double minArea = 100; // the minimum area for the detection to consider for your prop
 
         colourMassDetectionProcessor = new EnhancedColorDetectionProcessor(
-                lowerH,
-                upperH,
+
                 () -> minArea,
                 () -> left, // the left dividing line, in this case the left third of the frame
                 () -> right, // the left dividing line, in this case the right third of the frame
@@ -321,7 +320,7 @@ public class AllMechs {
     }
     public Action armWait(){
         return new ParallelAction(
-               new InstantAction(()-> arm_right.setPosition(arm_right_wait)),
+                new InstantAction(()-> arm_right.setPosition(arm_right_wait)),
                 new InstantAction(()-> arm_left.setPosition(arm_left_wait))
         );
     }
