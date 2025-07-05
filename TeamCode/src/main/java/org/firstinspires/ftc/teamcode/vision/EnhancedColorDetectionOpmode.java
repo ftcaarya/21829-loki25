@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -19,6 +20,9 @@ public class EnhancedColorDetectionOpmode extends OpMode {
     AllMechs robot;
     public Action dropPreloaded;
     public Action rightSideBarnacle;
+    public Gamepad gamepad1;
+    public Gamepad gamepad2;
+
 
     @Override
     public void init() {
@@ -32,8 +36,6 @@ public class EnhancedColorDetectionOpmode extends OpMode {
         double minArea = 100; // the minimum area for the detection to consider for your prop
 
         colourMassDetectionProcessor = new EnhancedColorDetectionProcessor(
-                lowerH,
-                upperH,
                 () -> minArea,
                 () -> 213, // the left dividing line, in this case the left third of the frame
                 () -> 426,
@@ -47,7 +49,7 @@ public class EnhancedColorDetectionOpmode extends OpMode {
                 .build();
 
 
-        robot = new AllMechs(hardwareMap, 213, 426);
+        robot = new AllMechs(hardwareMap, 213, 426, gamepad1, gamepad2 );
 
          Action dropPreloaded = drive.actionBuilder(initialPose)
                 .setReversed(false)
