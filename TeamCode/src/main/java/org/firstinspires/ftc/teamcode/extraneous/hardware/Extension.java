@@ -15,7 +15,7 @@ public class Extension extends OpMode {
     private PIDController controller_extension;
 
 
-    public static double p = 0, i = 0, d = 0;
+    public static double pe = 0, ie = 0, de = 0;
     public static double f = 0;
 
     public static int target = 0;
@@ -29,7 +29,7 @@ public class Extension extends OpMode {
 
     @Override
     public void init () {
-        controller_extension = new PIDController(p, i, d);
+        controller_extension = new PIDController(pe, ie, de);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
        extension = hardwareMap.get(DcMotorEx.class, "extension");
@@ -44,7 +44,7 @@ public class Extension extends OpMode {
 
     @Override
     public void loop () {
-        controller_extension.setPID(p, i, d);
+        controller_extension.setPID(pe, ie, de);
 
 
         int Pos = extension.getCurrentPosition();
