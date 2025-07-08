@@ -42,7 +42,11 @@ public class TeleOpTesting extends OpMode {
     @Override
     public void start() {
         runningActions.add(
-                robot.updateVertPID()
+                new ParallelAction(
+                        robot.updateVertPID(),
+                        robot.updateExtPID()
+                )
+
         );
     }
 
@@ -124,17 +128,29 @@ public class TeleOpTesting extends OpMode {
         if (gamepad1.dpad_down) {
             runningActions.add(
                     new SequentialAction(
-                            robot.setVertTarget(10),
+                            robot.setVertTarget(0),
                             robot.armDown(),
                             robot.wristDown()
                     )
             );
         }
-        if (gamepad1.dpad_down) {
+        if (gamepad2.dpad_down) {
             runningActions.add(
                     robot.armWait()
             );
         }
+        if (gamepad2.dpad_right) {
+            runningActions.add(
+                    robot.setExtTarget(550)
+            );
+        }
+        if (gamepad2.dpad_left) {
+            runningActions.add(
+                    robot.setExtTarget(20)
+            );
+        }
+
+
 
 
 
