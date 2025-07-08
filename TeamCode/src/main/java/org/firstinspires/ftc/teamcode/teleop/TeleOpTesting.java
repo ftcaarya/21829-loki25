@@ -42,7 +42,11 @@ public class TeleOpTesting extends OpMode {
     @Override
     public void start() {
         runningActions.add(
-                robot.updateVertPID()
+                new ParallelAction(
+                        robot.updateVertPID(),
+                        robot.updateExtPID()
+                )
+
         );
     }
 
