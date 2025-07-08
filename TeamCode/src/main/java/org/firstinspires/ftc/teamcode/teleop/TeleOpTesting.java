@@ -137,7 +137,7 @@ public class TeleOpTesting extends OpMode {
         }
         if (gamepad2.dpad_right) {
             runningActions.add(
-                    robot.setExtTarget(-500)
+                    robot.setExtTarget(550)
             );
         }
         if (gamepad2.dpad_left) {
