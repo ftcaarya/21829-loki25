@@ -33,7 +33,14 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 
 public class AllMechs {
     public  PIDController controller_right;
+
     public PIDController controller_extension;
+  
+
+
+    public static double pe = 0, ie = 0, de = 0;
+    public static double f = 0;
+
 
     public MultipleTelemetry telemetry;
 
@@ -69,8 +76,11 @@ public class AllMechs {
     public static double intake_up = .3;
     public static double intake_down = .8;
 
+
     public static double p = 0.01, i = 0, d = 0.00065;
     public static double f = 0.05;
+
+   
     public static int target = 0;
     public final double ticks_in_degree = 700/180.0;
 
@@ -81,6 +91,8 @@ public class AllMechs {
     public DcMotorEx extension;
 
     public DcMotor frontLeft, rearLeft, rearRight, frontRight;
+
+    public DcMotorEx extension;
     public ColorSensor colorSensor;
     public Gamepad testGamepad;
     public IMU imu;
@@ -111,6 +123,7 @@ public class AllMechs {
     public static double output;
 
     public static int vertTarget;
+    public static int extTarget;
 
 
 
@@ -159,6 +172,14 @@ public class AllMechs {
 
         vert_left.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         vert_right.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        controller_extension = new PIDController(pe, ie, de);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        extension = hardwareMap.get(DcMotorEx.class, "extension");
+
+
+        extension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extension.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         colorSensor = hardwareMap.get(ColorSensor.class, "color sensor");
 
@@ -226,6 +247,28 @@ public class AllMechs {
             return true;
         };
     }
+    public Action updateExtPID() {
+        return packet -> {
+            controller_extension.setPID(pe, ie, de);
+
+
+            int Pos = extension.getCurrentPosition();
+            double pid = controller_extension.calculate(Pos, (extTarget));
+
+            double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * fe;
+
+            double power = pid + ff;
+
+
+            extension.setPower(power);
+
+            return true;
+        };
+    }
+    public Action setExtTarget(int extarget) {
+        return new InstantAction(() -> extTarget = extarget);
+    }
+
 
     public Action updateHorPID() {
         return packet -> {
@@ -266,7 +309,10 @@ public class AllMechs {
 
 
     public Action intakeDown() {
+
         return new InstantAction(() -> hold.setPosition(.75));
+
+       
     }
 
     public Action intakeUp() {

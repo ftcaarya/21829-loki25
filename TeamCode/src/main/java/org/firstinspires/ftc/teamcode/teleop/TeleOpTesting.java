@@ -50,7 +50,11 @@ public class TeleOpTesting extends OpMode {
     @Override
     public void start() {
         runningActions.add(
-                robot.updateVertPID()
+                new ParallelAction(
+                        robot.updateVertPID(),
+                        robot.updateExtPID()
+                )
+
         );
         runningActions.add(
                 robot.updateHorPID()
@@ -128,6 +132,7 @@ public class TeleOpTesting extends OpMode {
 
         if (gamepad1.circle) {
             runningActions.add(
+
                     new ParallelAction(
                             robot.intakeUp(),
                             robot.stopIntake()
@@ -136,10 +141,31 @@ public class TeleOpTesting extends OpMode {
         }
 
         if (gamepad1.left_stick_button) {
+
+                    new SequentialAction(
+                            robot.setVertTarget(0),
+                            robot.armDown(),
+                            robot.wristDown()
+                    )
+            );
+        }
+        if (gamepad2.dpad_down) {
             runningActions.add(
                     robot.armWait()
             );
         }
+        if (gamepad2.dpad_right) {
+            runningActions.add(
+                    robot.setExtTarget(550)
+            );
+        }
+        if (gamepad2.dpad_left) {
+            runningActions.add(
+                    robot.setExtTarget(20)
+            );
+        }
+
+
 
 
 
