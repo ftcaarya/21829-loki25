@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -32,21 +33,19 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 
 public class AllMechs {
     public  PIDController controller_right;
-    private PIDController controller_extension;
+
+    public PIDController controller_extension;
+  
 
 
     public static double pe = 0, ie = 0, de = 0;
     public static double f = 0;
 
+
     public MultipleTelemetry telemetry;
 
-    public Servo claw, rotate, wrist_left, wrist_right, arm_left, arm_right, hor_left, hor_right, hold, pooper;
+    public Servo claw, rotate, wrist_left, wrist_right, arm_left, arm_right, hold, pooper;
 
-    public static double hor_left_extend = 0.5;
-    public static double hor_left_retract = 0.37;
-
-    public static double hor_right_extend = 0.4;
-    public static double hor_right_retract = .63;
 
     public static final double POOPER_BLOCK = 1;
     public static final double POOPER_PASS = .4;
@@ -60,15 +59,15 @@ public class AllMechs {
     public static double wrist_right_down = 0;
     public static double wrist_right_up = 1;
 
-    public static double arm_left_up = .8;
-    public static double arm_left_down = 0.32;
+    public static double arm_left_up = .59;
+    public static double arm_left_down = 0.18;
 
-    public static double arm_right_up = 0.2;
-    public static double arm_right_down = 0.68;
+    public static double arm_right_up = 0.41;
+    public static double arm_right_down = 0.82;
 
-    public static double arm_left_wait = 0.42;
+    public static double arm_left_wait = 0.7;
 
-    public static double arm_right_wait = 0.58;
+    public static double arm_right_wait = 0.3;
 
 
     public static final double rotate_hor = 0.22;
@@ -77,10 +76,19 @@ public class AllMechs {
     public static double intake_up = .3;
     public static double intake_down = .8;
 
-    public static double p = 0.02, i = 0, d = 0.00065;
-    public static double fe = 0.05;
+
+    public static double p = 0.01, i = 0, d = 0.00065;
+    public static double f = 0.05;
+
+   
     public static int target = 0;
     public final double ticks_in_degree = 700/180.0;
+
+    public static double pe = 0.04, ie = 0, de = 0.0007;
+
+    public static int hor_target = 0;
+
+    public DcMotorEx extension;
 
     public DcMotor frontLeft, rearLeft, rearRight, frontRight;
 
@@ -129,9 +137,6 @@ public class AllMechs {
         arm_left = hardwareMap.get(Servo.class, "arm left");
         arm_right = hardwareMap.get(Servo.class, "arm right");
 
-        hor_left = hardwareMap.get(Servo.class, "hor left");
-        hor_right = hardwareMap.get(Servo.class, "hor right");
-
         pooper = hardwareMap.get(Servo.class, "pooper");
 
         intake = hardwareMap.get(DcMotor.class, "intake");
@@ -141,6 +146,12 @@ public class AllMechs {
 
         this.gamepad1 = gamepad1;
         this.gamepad2 = gamepad2;
+
+        controller_extension = new PIDController(pe, ie, de);
+
+        extension = hardwareMap.get(DcMotorEx.class, "extension");
+        extension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extension.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         frontRight = hardwareMap.get(DcMotor.class, "front right");
@@ -259,8 +270,49 @@ public class AllMechs {
     }
 
 
+    public Action updateHorPID() {
+        return packet -> {
+            controller_extension.setPID(pe, ie, de);
+
+
+            int Pos = extension.getCurrentPosition();
+            double power = controller_extension.calculate(Pos, (-hor_target));
+
+
+
+
+            extension.setPower(power);
+
+            return true;
+        };
+    }
+
+    public Action vertSample(){
+        return new InstantAction(() -> vertTarget = 2700);
+    }
+
+    public Action vertDown() {
+        return new InstantAction(() -> vertTarget = 50);
+    }
+
+    public Action setHorTarget(int target) {
+        return new InstantAction(() -> hor_target = target);
+    }
+
+    public Action horExtend() {
+        return new InstantAction(() -> hor_target = 350);
+    }
+
+    public Action horRetract() {
+        return new InstantAction(() -> hor_target = 20);
+    }
+
+
     public Action intakeDown() {
-        return new InstantAction(() -> hold.setPosition(.83));
+
+        return new InstantAction(() -> hold.setPosition(.75));
+
+       
     }
 
     public Action intakeUp() {
@@ -269,19 +321,29 @@ public class AllMechs {
 
     public Action checkColorRed() {
         return p -> {
-            hold.setPosition(.87);
+            hold.setPosition(.75);
 
             if (colorSensor.red() > colorSensor.green() + 50 && colorSensor.red() > colorSensor.blue() + 50) {
                 pooper.setPosition(POOPER_BLOCK);
+                gamepad1.rumbleBlips(1);
+                gamepad1.setLedColor(255, 0, 0, 5000);
                 intake.setPower(0);
+                hold.setPosition(.3);
+                setHorTarget(20);
                 return false;
             } else if ((colorSensor.green() > colorSensor.blue()) && (colorSensor.red() > colorSensor.blue())) {
                 pooper.setPosition(POOPER_BLOCK);
+                gamepad1.setLedColor(230, 230, 0, 5000);
+                gamepad1.rumbleBlips(1);
                 intake.setPower(0);
+                hold.setPosition(.3);
+                setHorTarget(20);
                 return false;
             } else if (colorSensor.blue() > colorSensor.green() + 50 && colorSensor.blue() > colorSensor.red() + 50) {
                 pooper.setPosition(POOPER_PASS);
-                intake.setPower(-.9);
+                gamepad1.setLedColor(0, 0, 225, 5000);
+                gamepad1.rumbleBlips(1);
+                intake.setPower(-.65);
                 return true;
             } else if (gamepad1.square) {
                 pooper.setPosition(POOPER_BLOCK);
@@ -290,7 +352,7 @@ public class AllMechs {
                 return false;
             } else {
                 pooper.setPosition(POOPER_BLOCK);
-                intake.setPower(-.9);
+                intake.setPower(-.65);
                 return true;
             }
         };
@@ -304,13 +366,13 @@ public class AllMechs {
     }
 
     public Action armUp() {
-        return new ParallelAction(
+        return new SequentialAction(
                 new InstantAction(() -> arm_left.setPosition(arm_left_up)),
                 new InstantAction(() -> arm_right.setPosition(arm_right_up))
         );
     }
     public Action armDown() {
-        return new ParallelAction(
+        return new SequentialAction(
                 new InstantAction(() -> arm_left.setPosition(arm_left_down)),
                 new InstantAction(() -> arm_right.setPosition(arm_right_down))
         );
@@ -343,18 +405,6 @@ public class AllMechs {
     public Action rotateVert() {
         return new InstantAction(() -> rotate.setPosition(rotate_vert));
 
-    }
-    public Action horExtend() {
-        return new ParallelAction(
-                new InstantAction(() -> hor_left.setPosition(hor_left_extend)),
-                new InstantAction(() -> hor_right.setPosition(hor_right_extend))
-        );
-    }
-    public Action horRetract() {
-        return new ParallelAction(
-                new InstantAction(() -> hor_left.setPosition(hor_left_retract)),
-                new InstantAction(() -> hor_right.setPosition(hor_right_retract))
-        );
     }
     public Action armWait(){
         return new ParallelAction(

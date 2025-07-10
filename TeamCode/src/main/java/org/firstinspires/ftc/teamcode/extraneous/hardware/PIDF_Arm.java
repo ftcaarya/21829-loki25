@@ -47,7 +47,6 @@ public class PIDF_Arm extends OpMode {
 
     @Override
     public void loop () {
-        controller_left.setPID(p, i, d);
         controller_right.setPID(p, i, d);
 
 //        int leftPos = elevator_left.getCurrentPosition();
@@ -67,7 +66,7 @@ public class PIDF_Arm extends OpMode {
 //        telemetry.addData("Left Pos", leftPos);
         telemetry.addData("Target", target);
 //        telemetry.addData("Left Power", power_left);
-//        telemetry.addData("Right Power", power_right);
+        telemetry.addData("Right Power", power_right);
         telemetry.update();
 
 

@@ -10,10 +10,12 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.extraneous.AllMechs;
 
 public abstract class MasterAuto extends LinearOpMode {
     MecanumDrive drive;
     MultipleTelemetry mTelemetry;
+    AllMechs robot;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -21,6 +23,7 @@ public abstract class MasterAuto extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, initialPose);
 
         mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        robot = new AllMechs(hardwareMap, 200, 300, gamepad1, gamepad2);
 
         Action action = onRun();
 
@@ -28,8 +31,12 @@ public abstract class MasterAuto extends LinearOpMode {
 
         while (opModeIsActive()) {
             Actions.runBlocking(
-                    new SequentialAction(
-                            action
+                    new ParallelAction(
+                            new SequentialAction(
+                                    action
+                            ),
+                            robot.updateHorPID(),
+                            robot.updateVertPID()
                     )
             );
 
