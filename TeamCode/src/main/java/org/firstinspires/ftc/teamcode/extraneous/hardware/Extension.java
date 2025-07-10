@@ -15,12 +15,10 @@ public class Extension extends OpMode {
     private PIDController controller_extension;
 
 
-    public static double p = 0, i = 0, d = 0;
-    public static double f = 0;
+    public static double p = 0.05, i = 0, d = 0;
 
     public static int target = 0;
 
-    private final double ticks_in_degree = 700/180.0;
     private DcMotorEx extension;
 
 
@@ -32,7 +30,7 @@ public class Extension extends OpMode {
         controller_extension = new PIDController(p, i, d);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-       extension = hardwareMap.get(DcMotorEx.class, "extension");
+        extension = hardwareMap.get(DcMotorEx.class, "extension");
 
 
         extension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -48,11 +46,9 @@ public class Extension extends OpMode {
 
 
         int Pos = extension.getCurrentPosition();
-        double pid = controller_extension.calculate(Pos, (target));
+        double power = controller_extension.calculate(Pos, (-target));
 
-        double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
 
-        double power = pid + ff;
 
 
         extension.setPower(power);
@@ -61,8 +57,6 @@ public class Extension extends OpMode {
         telemetry.addData("Target", target);
 
         telemetry.update();
-
-
 
     }
 

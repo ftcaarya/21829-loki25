@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.extraneous;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad2;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.vision.VisionPortal.CameraState.STREAMING;
 
@@ -9,7 +11,9 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -26,6 +30,7 @@ public class DetermineBarnacle {
     private VisionPortal visionPortal;
     private EnhancedColorDetectionProcessor colourMassDetectionProcessor;
     static MecanumDrive drive;
+    static AllMechs robot;
 
     // HSV takes the form: (HUE, SATURATION, VALUE)
     // the domains are: ([0, 180], [0, 255], [0, 255])
@@ -41,6 +46,8 @@ public class DetermineBarnacle {
 
     public DetermineBarnacle(double minArea, double left, double right, Pose2d poseGiven) {
         this.pose = poseGiven;
+
+        robot = new AllMechs(hardwareMap, (int)(left), (int)right, gamepad1, gamepad2);
 
         colourMassDetectionProcessor = new EnhancedColorDetectionProcessor(
                 () -> minArea,
@@ -88,8 +95,16 @@ public class DetermineBarnacle {
             case MIDDLE:
                 targetSampleTrajectory = drive.actionBuilder(pose)
                         .turnTo(Math.toRadians(65))
-                        // add the intake for the right sample
+                        .stopAndAdd(
+                                new ParallelAction(
+                                        robot.setHorTarget(700),
+                                        robot.checkColorRed()
+                                )
+                        )
                         .setTangent(0)
+                        .stopAndAdd(new ParallelAction(
+
+                        ))
                         .splineToLinearHeading(new Pose2d(-52, -52, Math.toRadians(45)), -Math.PI)
                         // add the deposit action for the sample it holds
                         .setTangent(0)
