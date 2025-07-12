@@ -34,7 +34,9 @@ public class TeleOpTesting extends OpMode {
     MecanumDrive drive;
     Gamepad currentGamepad1;
     Gamepad previousGamepad1;
+
     boolean horToggle = false;
+
 
 
     private final FtcDashboard dash = FtcDashboard.getInstance();
@@ -63,11 +65,13 @@ public class TeleOpTesting extends OpMode {
 
 
 
+
     }
 
     @Override
     public void loop() {
         TelemetryPacket packet = new TelemetryPacket();
+
 
         drive.setDrivePowers(new PoseVelocity2d(
                 new Vector2d(
@@ -76,6 +80,7 @@ public class TeleOpTesting extends OpMode {
                 ),
                 -gamepad1.right_stick_x
         ));
+
 
         if (gamepad1.dpad_up) {
             runningActions.add(
@@ -91,7 +96,9 @@ public class TeleOpTesting extends OpMode {
             runningActions.add(
                     new SequentialAction(
                             robot.setVertTarget(20),
+
                             robot.armWait(),
+
                             robot.wristDown()
                     )
             );
@@ -100,23 +107,28 @@ public class TeleOpTesting extends OpMode {
 
         if (gamepad1.dpad_right) {
             runningActions.add(
+
                     robot.setExtTarget(400)
+
 
             );
             horToggle = true;
         }
+
         if (gamepad1.dpad_left && !horToggle) {
             runningActions.add(
                     robot.setExtTarget(20)
             );
         }
         if (gamepad1.dpad_left && horToggle) {
+
             runningActions.add(
                     robot.setExtTarget(-100)
             );
         }
         if(gamepad1.left_bumper) {
             runningActions.add(
+
                     robot.clawOpen()
             );
         }
@@ -134,6 +146,7 @@ public class TeleOpTesting extends OpMode {
             runningActions.add(new ParallelAction(
                     robot.intakeDown(),
                     robot.checkColorRed(),
+
                     robot.armWait()
             ));
         }
@@ -154,7 +167,6 @@ public class TeleOpTesting extends OpMode {
                     robot.armDown()
             );
         }
-
 
 
 
