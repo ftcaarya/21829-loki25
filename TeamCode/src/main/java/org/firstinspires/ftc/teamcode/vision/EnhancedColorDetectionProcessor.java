@@ -125,6 +125,9 @@ public class EnhancedColorDetectionProcessor implements VisionProcessor, CameraS
         Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGB2HSV);
         // thats why you need to give your scalar upper and lower bounds as HSV values
 
+        // Store the original HSV frame for calculating mean saturation
+        Mat originalHsvFrame = frame.clone();
+
         if (upper.val[0] < lower.val[0]) {
             // makes new scalars for the upper [upper, 0] detection, places the result in sel1
             Core.inRange(frame, new Scalar(upper.val[0], lower.val[1], lower.val[2]), new Scalar(0, upper.val[1], upper.val[2]), sel1);
@@ -164,8 +167,19 @@ public class EnhancedColorDetectionProcessor implements VisionProcessor, CameraS
         // and then if our area is larger than our minimum area, and our currently found largest area
         // it stores the contour as our largest contour and the area as our largest area
         for (MatOfPoint contour : contours) {
-            double meanSaturation = Core.mean(contour).val[1];
+            // Create a mask for this contour to calculate mean saturation properly
+            Mat contourMask = Mat.zeros(originalHsvFrame.size(), originalHsvFrame.type());
+            ArrayList<MatOfPoint> contourList = new ArrayList<>();
+            contourList.add(contour);
+            Imgproc.fillPoly(contourMask, contourList, new Scalar(255, 255, 255));
+            
+            // Calculate mean saturation using the original HSV frame and contour mask
+            double meanSaturation = Core.mean(originalHsvFrame, contourMask).val[1];
             double area = Imgproc.contourArea(contour);
+            
+            // Release the contour mask to prevent memory leaks
+            contourMask.release();
+            
             if (meanSaturation > mostSaturatedContourSaturation && area > minArea) {
                 mostSaturatedContour = contour;
                 mostSaturatedContourSaturation = meanSaturation;
@@ -231,6 +245,10 @@ public class EnhancedColorDetectionProcessor implements VisionProcessor, CameraS
         Bitmap b = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.RGB_565);
         Utils.matToBitmap(frame, b);
         lastFrame.set(b);
+        
+        // Release the original HSV frame to prevent memory leaks
+        originalHsvFrame.release();
+        
         return frame;
     }
 
