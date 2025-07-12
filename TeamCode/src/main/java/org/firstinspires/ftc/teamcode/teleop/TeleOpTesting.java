@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import static java.lang.Boolean.FALSE;
+
 import android.app.Notification;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -31,8 +34,9 @@ public class TeleOpTesting extends OpMode {
     MecanumDrive drive;
     Gamepad currentGamepad1;
     Gamepad previousGamepad1;
+
     boolean horToggle = false;
-    boolean intakeToggle = false;
+
 
 
     private final FtcDashboard dash = FtcDashboard.getInstance();
@@ -53,22 +57,30 @@ public class TeleOpTesting extends OpMode {
         runningActions.add(
                 new ParallelAction(
                         robot.updateVertPID(),
-                        robot.updateExtPID()
+                        robot.updateHorPID(),
+                        robot.rotateHor()
                 )
 
         );
-        runningActions.add(
-                robot.updateHorPID()
-        );
-        runningActions.add(
-                robot.rotateHor()
-        );
+
+
+
 
     }
 
     @Override
     public void loop() {
         TelemetryPacket packet = new TelemetryPacket();
+
+
+        drive.setDrivePowers(new PoseVelocity2d(
+                new Vector2d(
+                        .484038 * Math.tan(1.12 * -gamepad1.left_stick_y),
+                        .484038 * Math.tan(1.12 * -gamepad1.left_stick_x)
+                ),
+                -gamepad1.right_stick_x
+        ));
+
 
         if (gamepad1.dpad_up) {
             runningActions.add(
@@ -84,7 +96,9 @@ public class TeleOpTesting extends OpMode {
             runningActions.add(
                     new SequentialAction(
                             robot.setVertTarget(20),
-                            robot.armDown(),
+
+                            robot.armWait(),
+
                             robot.wristDown()
                     )
             );
@@ -93,45 +107,46 @@ public class TeleOpTesting extends OpMode {
 
         if (gamepad1.dpad_right) {
             runningActions.add(
-                    robot.setExtTarget(-400)
+
+                    robot.setExtTarget(400)
+
+
             );
             horToggle = true;
         }
-        if(gamepad1.dpad_left && !horToggle) {
+
+        if (gamepad1.dpad_left && !horToggle) {
             runningActions.add(
-                    robot.setExtTarget(-20)
+                    robot.setExtTarget(20)
             );
         }
         if (gamepad1.dpad_left && horToggle) {
+
             runningActions.add(
-                    robot.setExtTarget(100)
-            );
-        }
-        if(gamepad1.right_bumper) {
-            runningActions.add(
-                    robot.clawOpen()
+                    robot.setExtTarget(-100)
             );
         }
         if(gamepad1.left_bumper) {
+            runningActions.add(
+
+                    robot.clawOpen()
+            );
+        }
+        if(gamepad1.right_bumper) {
             runningActions.add(
                     robot.clawClose()
             );
         }
 
 
-        drive.setDrivePowers(new PoseVelocity2d(
-                new Vector2d(
-                        .484038 * Math.tan(1.12 * -gamepad1.left_stick_y),
-                        .484038 * Math.tan(1.12 * -gamepad1.left_stick_x)
-                ),
-                -gamepad1.right_stick_x
-        ));
+
 
 
         if (gamepad1.right_stick_button) {
             runningActions.add(new ParallelAction(
                     robot.intakeDown(),
                     robot.checkColorRed(),
+
                     robot.armWait()
             ));
         }
@@ -148,26 +163,8 @@ public class TeleOpTesting extends OpMode {
         }
 
         if (gamepad1.left_stick_button) {
-
-            new SequentialAction(
-                    robot.setVertTarget(0),
-                    robot.armDown(),
-                    robot.wristDown()
-            );
-        }
-        if (gamepad2.dpad_down) {
             runningActions.add(
-                    robot.armWait()
-            );
-        }
-        if (gamepad2.dpad_right) {
-            runningActions.add(
-                    robot.setExtTarget(550)
-            );
-        }
-        if (gamepad2.dpad_left) {
-            runningActions.add(
-                    robot.setExtTarget(20)
+                    robot.armDown()
             );
         }
 
