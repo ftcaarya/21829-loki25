@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode.teleop;
 
+import static java.lang.Boolean.FALSE;
+
 import android.app.Notification;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -14,6 +17,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -28,6 +32,10 @@ public class TeleOpTesting extends OpMode {
     AllMechs robot;
     ActionSchedular actionSchedular;
     MecanumDrive drive;
+    Gamepad currentGamepad1;
+    Gamepad previousGamepad1;
+    boolean horToggle = false;
+
 
     private final FtcDashboard dash = FtcDashboard.getInstance();
     private List<Action> runningActions = new ArrayList<>();
@@ -37,6 +45,9 @@ public class TeleOpTesting extends OpMode {
         robot = new AllMechs(hardwareMap, 0, 0, gamepad1, gamepad2);
         drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
         actionSchedular = new ActionSchedular();
+        previousGamepad1 = new Gamepad();
+        currentGamepad1 = new Gamepad();
+
     }
 
     @Override
@@ -44,10 +55,14 @@ public class TeleOpTesting extends OpMode {
         runningActions.add(
                 new ParallelAction(
                         robot.updateVertPID(),
-                        robot.updateExtPID()
+                        robot.updateHorPID(),
+                        robot.rotateHor()
                 )
 
         );
+
+
+
     }
 
     @Override
@@ -62,91 +77,81 @@ public class TeleOpTesting extends OpMode {
                 -gamepad1.right_stick_x
         ));
 
-
-        if (gamepad1.right_stick_button) {
-            runningActions.add(new ParallelAction(
-                    robot.intakeDown(),
-                    robot.checkColorRed()
-            ));
-        }
-
-
-        if (gamepad1.circle) {
-            runningActions.add(new ParallelAction(
-                            robot.intakeUp(),
-                            robot.stopIntake()
-                    )
-            );
-        }
-
-        if (gamepad1.dpad_left) {
-            runningActions.add(
-                    robot.horExtend()
-            );
-        }
-
-        if (gamepad1.dpad_right) {
-            runningActions.add(
-                    robot.horRetract()
-            );
-        }
-        if (gamepad1.right_bumper) {
-            runningActions.add(
-                    robot.clawClose()
-            );
-        }
-
-        if (gamepad1.left_bumper) {
-            runningActions.add(
-                    robot.clawOpen()
-            );
-        }
-        if (gamepad1.cross) {
-            runningActions.add(
-                    robot.rotateHor()
-            );
-        }
-
-        if (gamepad1.triangle) {
-            runningActions.add(
-                    robot.rotateVert()
-            );
-        }
-
         if (gamepad1.dpad_up) {
             runningActions.add(
                     new SequentialAction(
-                            robot.setVertTarget(3000),
-                            new SleepAction(2),
+                            robot.setVertTarget(2900),
                             robot.armUp(),
                             robot.wristUp()
                     )
-
             );
         }
 
         if (gamepad1.dpad_down) {
             runningActions.add(
                     new SequentialAction(
-                            robot.setVertTarget(0),
-                            robot.armDown(),
+                            robot.setVertTarget(20),
+                            robot.armWait(),
                             robot.wristDown()
                     )
             );
         }
-        if (gamepad2.dpad_down) {
+
+
+        if (gamepad1.dpad_right) {
             runningActions.add(
-                    robot.armWait()
+                    robot.setExtTarget(400)
+
             );
+            horToggle = true;
         }
-        if (gamepad2.dpad_right) {
-            runningActions.add(
-                    robot.setExtTarget(550)
-            );
-        }
-        if (gamepad2.dpad_left) {
+        if (gamepad1.dpad_left && !horToggle) {
             runningActions.add(
                     robot.setExtTarget(20)
+            );
+        }
+        if (gamepad1.dpad_left && horToggle) {
+            runningActions.add(
+                    robot.setExtTarget(-100)
+            );
+        }
+        if(gamepad1.left_bumper) {
+            runningActions.add(
+                    robot.clawOpen()
+            );
+        }
+        if(gamepad1.right_bumper) {
+            runningActions.add(
+                    robot.clawClose()
+            );
+        }
+
+
+
+
+
+        if (gamepad1.right_stick_button) {
+            runningActions.add(new ParallelAction(
+                    robot.intakeDown(),
+                    robot.checkColorRed(),
+                    robot.armWait()
+            ));
+        }
+
+
+        if (gamepad1.circle) {
+            runningActions.add(
+
+                    new ParallelAction(
+                            robot.intakeUp(),
+                            robot.stopIntake()
+                    )
+            );
+        }
+
+        if (gamepad1.left_stick_button) {
+            runningActions.add(
+                    robot.armDown()
             );
         }
 
@@ -167,4 +172,3 @@ public class TeleOpTesting extends OpMode {
         dash.sendTelemetryPacket(packet);
     }
 }
-
