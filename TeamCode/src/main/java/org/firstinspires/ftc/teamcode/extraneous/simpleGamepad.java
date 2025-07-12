@@ -15,10 +15,10 @@ public class simpleGamepad extends OpMode {
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotor.class, "leftfront");
-        rearLeft = hardwareMap.get(DcMotor.class, "leftback");
-        rearRight = hardwareMap.get(DcMotor.class, "rightback");
-        frontRight = hardwareMap.get(DcMotor.class, "rightfront");
+        frontLeft = hardwareMap.get(DcMotor.class, "front left");
+        rearLeft = hardwareMap.get(DcMotor.class, "rear left");
+        rearRight = hardwareMap.get(DcMotor.class, "rear right");
+        frontRight = hardwareMap.get(DcMotor.class, "front right");
 
         // Change this
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
