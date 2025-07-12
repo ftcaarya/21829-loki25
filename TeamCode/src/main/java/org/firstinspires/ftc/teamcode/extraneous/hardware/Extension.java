@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Config
 @TeleOp(name = "PID Tuning for extension")
@@ -36,6 +37,7 @@ public class Extension extends OpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         extension = hardwareMap.get(DcMotorEx.class, "extension");
+        extension.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         extension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -51,7 +53,7 @@ public class Extension extends OpMode {
 
 
         int Pos = extension.getCurrentPosition();
-        double power = controller_extension.calculate(Pos, (-target));
+        double power = controller_extension.calculate(Pos, (target));
 
 
 

@@ -49,7 +49,7 @@ public class HardwareTesting extends OpMode {
     public static double intake_right_down = 0;
     public static double intake_right_up = 1;
 
-    public static double arm_left_up = .8;
+    public static double arm_left_up = .59;
     public static double arm_left_down = 0.32;
 
     public static double arm_right_up = 0.2;
