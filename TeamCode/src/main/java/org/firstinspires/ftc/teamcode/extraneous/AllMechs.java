@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -37,17 +38,16 @@ public class AllMechs {
     public PIDController controller_extension;
 
 
-
-
     public MultipleTelemetry telemetry;
 
     public Servo claw, rotate, wrist_left, wrist_right, arm_left, arm_right, hold, pooper;
 
+
     public static final double POOPER_BLOCK = 1;
     public static final double POOPER_PASS = .4;
 
-    public static final double CLAW_OPEN = 0.6;
-    public static final double CLAW_CLOSE = 0;
+    public static final double CLAW_OPEN = 1;
+    public static final double CLAW_CLOSE = 0.05;
 
     public static double wrist_left_down = 1;
     public static double wrist_left_up = 0;
@@ -55,16 +55,15 @@ public class AllMechs {
     public static double wrist_right_down = 0;
     public static double wrist_right_up = 1;
 
-
     public static double arm_left_up = .8;
     public static double arm_left_down = 0.32;
+
     public static double arm_right_up = 0.2;
     public static double arm_right_down = 0.68;
 
+    public static double arm_left_wait = 0.52;
 
-    public static double arm_left_wait = 0.7;
-
-    public static double arm_right_wait = 0.3;
+    public static double arm_right_wait = 0.48;
 
 
     public static final double rotate_hor = 0.22;
@@ -74,10 +73,8 @@ public class AllMechs {
     public static double intake_down = .8;
 
 
-
-    public static double p = 0.03, i = 0, d = 0.00065;
-    public static double f = 0.05;
-
+    public static double p = 0.02, i = 0, d = 0.00065;
+    public static double f = 0.01;
 
 
     public static int target = 0;
@@ -87,11 +84,9 @@ public class AllMechs {
 
     public static int hor_target = 0;
 
-
     public DcMotorEx extension;
 
     public DcMotor frontLeft, rearLeft, rearRight, frontRight;
-
 
     public ColorSensor colorSensor;
     public Gamepad testGamepad;
@@ -124,7 +119,6 @@ public class AllMechs {
 
     public static int vertTarget;
     public static int extTarget;
-    public static boolean horToggle = false;
 
 
 
@@ -229,6 +223,25 @@ public class AllMechs {
     public Action setVertTarget(int target) {
         return new InstantAction(() -> vertTarget = target);
     }
+    public Action transfer() {
+        return new SequentialAction(
+                new ParallelAction(
+                        armWait(),
+                        clawOpen()
+                ),
+                new SleepAction(0.5),
+                setExtTarget(150),
+                armDown(),
+                clawClose(),
+                new SleepAction(1),
+                new ParallelAction(
+                setVertTarget(2790),
+                armUp(),
+                wristUp()
+        )
+
+        );
+    }
 
     public Action updateVertPID() {
         return packet -> {
@@ -247,62 +260,36 @@ public class AllMechs {
             return true;
         };
     }
+    public Action updateExtPID() {
+        return packet -> {
+            controller_extension.setPID(pe, ie, de);
 
+
+            int Pos = extension.getCurrentPosition();
+            double pid = controller_extension.calculate(Pos, (extTarget));
+
+            double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
+
+            double power = pid + ff;
+
+
+            extension.setPower(power);
+
+            return true;
+        };
+    }
     public Action setExtTarget(int extarget) {
-        return new InstantAction(() -> hor_target = extarget);
+        return new InstantAction(() -> extTarget = extarget);
     }
 
-
-    public Action updateHorPID() {
-        return packet -> {
-            controller_extension.setPID(pe, ie, de);
-
-
-            int Pos = extension.getCurrentPosition();
-            double power = controller_extension.calculate(Pos, (-hor_target));
-
-
-
-
-            extension.setPower(power);
-
-            return true;
-        };
+    public Action intakeIn(){
+        return new InstantAction(() -> intake.setPower(-0.5));
     }
 
-    public Action vertSample(){
-        return new InstantAction(() -> vertTarget = 2700);
+    public Action intakeBack(){
+        return new InstantAction(() -> intake.setPower(0.5));
     }
 
-    public Action vertDown() {
-        return new InstantAction(() -> vertTarget = 50);
-    }
-
-    public Action horExtend() {
-        return new InstantAction(() -> hor_target = 350);
-    }
-
-    public Action horRetract() {
-        return new InstantAction(() -> hor_target = 20);
-    }
-
-
-    public Action updateHorPID() {
-        return packet -> {
-            controller_extension.setPID(pe, ie, de);
-
-
-            int Pos = extension.getCurrentPosition();
-            double power = controller_extension.calculate(Pos, (-hor_target));
-
-
-
-
-            extension.setPower(power);
-
-            return true;
-        };
-    }
 
     public Action vertSample(){
         return new InstantAction(() -> vertTarget = 2700);
@@ -329,6 +316,7 @@ public class AllMechs {
 
         return new InstantAction(() -> hold.setPosition(.75));
 
+
     }
 
     public Action intakeUp() {
@@ -345,9 +333,7 @@ public class AllMechs {
                 gamepad1.setLedColor(255, 0, 0, 5000);
                 intake.setPower(0);
                 hold.setPosition(.3);
-
-                setExtTarget(20);
-
+                setHorTarget(20);
                 return false;
             } else if ((colorSensor.green() > colorSensor.blue()) && (colorSensor.red() > colorSensor.blue())) {
                 pooper.setPosition(POOPER_BLOCK);
@@ -355,9 +341,7 @@ public class AllMechs {
                 gamepad1.rumbleBlips(1);
                 intake.setPower(0);
                 hold.setPosition(.3);
-
-                setExtTarget(20);
-
+                setHorTarget(20);
                 return false;
             } else if (colorSensor.blue() > colorSensor.green() + 50 && colorSensor.blue() > colorSensor.red() + 50) {
                 pooper.setPosition(POOPER_PASS);

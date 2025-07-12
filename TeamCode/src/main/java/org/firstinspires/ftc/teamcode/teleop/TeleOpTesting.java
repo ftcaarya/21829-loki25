@@ -36,7 +36,8 @@ public class TeleOpTesting extends OpMode {
     Gamepad previousGamepad1;
 
     boolean horToggle = false;
-
+    boolean intakeInToggle = false;
+    boolean intakeOutToggle = false;
 
 
     private final FtcDashboard dash = FtcDashboard.getInstance();
@@ -57,13 +58,11 @@ public class TeleOpTesting extends OpMode {
         runningActions.add(
                 new ParallelAction(
                         robot.updateVertPID(),
-                        robot.updateHorPID(),
+                        robot.updateExtPID(),
                         robot.rotateHor()
                 )
 
         );
-
-
 
 
     }
@@ -80,22 +79,28 @@ public class TeleOpTesting extends OpMode {
                 ),
                 -gamepad1.right_stick_x
         ));
+        previousGamepad1.copy(currentGamepad1);
+        currentGamepad1.copy(gamepad1);
 
-
+//        if (gamepad1.dpad_up) {
+//            runningActions.add(
+//                    new ParallelAction(
+//                            robot.setVertTarget(2790),
+//                            robot.armUp(),
+//                            robot.wristUp()
+//                    )
+//            );
+//        }
         if (gamepad1.dpad_up) {
             runningActions.add(
-                    new SequentialAction(
-                            robot.setVertTarget(2900),
-                            robot.armUp(),
-                            robot.wristUp()
-                    )
-            );
+                    robot.transfer()
+                    );
         }
 
         if (gamepad1.dpad_down) {
             runningActions.add(
-                    new SequentialAction(
-                            robot.setVertTarget(20),
+                    new ParallelAction(
+                            robot.setVertTarget(0),
 
                             robot.armWait(),
 
@@ -108,7 +113,7 @@ public class TeleOpTesting extends OpMode {
         if (gamepad1.dpad_right) {
             runningActions.add(
 
-                    robot.setExtTarget(400)
+                    robot.setExtTarget(-400)
 
 
             );
@@ -117,29 +122,26 @@ public class TeleOpTesting extends OpMode {
 
         if (gamepad1.dpad_left && !horToggle) {
             runningActions.add(
-                    robot.setExtTarget(20)
+                    robot.setExtTarget(-20)
             );
         }
         if (gamepad1.dpad_left && horToggle) {
 
             runningActions.add(
-                    robot.setExtTarget(-100)
+                    robot.setExtTarget(150)
             );
         }
-        if(gamepad1.left_bumper) {
+        if (gamepad1.left_bumper) {
             runningActions.add(
 
                     robot.clawOpen()
             );
         }
-        if(gamepad1.right_bumper) {
+        if (gamepad1.right_bumper) {
             runningActions.add(
                     robot.clawClose()
             );
         }
-
-
-
 
 
         if (gamepad1.right_stick_button) {
@@ -167,6 +169,37 @@ public class TeleOpTesting extends OpMode {
                     robot.armDown()
             );
         }
+        if(gamepad1.cross) {
+            runningActions.add(
+                    robot.intakeIn()
+            );
+        }
+        if(gamepad1.triangle){
+            runningActions.add(
+                    robot.intakeBack()
+            );
+        }
+//        if (currentGamepad1.cross && !previousGamepad1.cross) {
+//            intakeInToggle = !intakeInToggle;
+//        }
+//        if (intakeInToggle) {
+//            runningActions.add(
+//                    new InstantAction(() ->
+//                            robot.intake.setPower(-0.5)
+//                    ));
+//
+//        }
+//        if (currentGamepad1.triangle && !previousGamepad1.triangle) {
+//            intakeOutToggle = !intakeOutToggle;
+//        }
+//        if (intakeOutToggle) {
+//            runningActions.add(
+//                    new InstantAction(() ->
+//                            robot.intake.setPower(.5)
+//                    ));
+//
+//        }
+
 
 
 

@@ -35,7 +35,7 @@ public abstract class MasterAuto extends LinearOpMode {
                             new SequentialAction(
                                     action
                             ),
-                            robot.updateHorPID(),
+                            robot.updateExtPID(),
                             robot.updateVertPID()
                     )
             );
